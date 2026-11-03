@@ -1,0 +1,36 @@
+name: build
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Test
+        run: dotnet test tests/KeyTrainer.Tests -c Release
+
+      - name: Publish single-file exe
+        run: dotnet publish src/KeyTrainer -c Release -o publish
+
+      - name: Defender scan
+        shell: pwsh
+        run: |
+          $mp = Get-ChildItem "$env:ProgramData\Microsoft\Windows Defender\Platform\*\MpCmdRun.exe" -ErrorAction SilentlyContinue | Select-Object -Last 1
+          if (-not $mp) { $mp = Get-Item "$env:ProgramFiles\Windows Defender\MpCmdRun.exe" -ErrorAction SilentlyContinue }
+          if (-not $mp) { Write-Host "MpCmdRun not found, skipping scan"; exit 0 }
+          & $mp.FullName -Scan -ScanType 3 -File "$PWD\publish\KeyTrainer.exe" -DisableRemediation
+          if ($LASTEXITCODE -eq 2) { Write-Error "Defender flagged KeyTrainer.exe"; exit 1 }
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: KeyTrainer
+          path: publish/KeyTrainer.exe

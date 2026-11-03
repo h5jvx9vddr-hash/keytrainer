@@ -1,0 +1,17 @@
+<Project>
+  <PropertyGroup>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>latest</LangVersion>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+
+    <!-- Clean metadata helps antivirus reputation -->
+    <Version>0.1.0</Version>
+    <Product>KeyTrainer</Product>
+    <Company>KeyTrainer</Company>
+    <Authors>KeyTrainer</Authors>
+    <Description>Tastatur-Trainer für Windows</Description>
+    <Copyright>© 2026</Copyright>
+    <NeutralLanguage>de-DE</NeutralLanguage>
+  </PropertyGroup>
+</Project>

@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/KeyTrainer.Core/KeyTrainer.Core.csproj" />
+    <Project Path="src/KeyTrainer/KeyTrainer.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/KeyTrainer.Tests/KeyTrainer.Tests.csproj" />
+  </Folder>
+</Solution>

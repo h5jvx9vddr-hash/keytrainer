@@ -7,7 +7,8 @@ Offene Punkte: Todo-App (`todo ls -p keytrainer`), nicht hier.
 - `src/KeyTrainer.Core` – plattformneutrale Logik (net10.0), unter Linux testbar.
 - `src/KeyTrainer` – WPF-App (net10.0-windows), baut unter Linux per `EnableWindowsTargeting`, läuft nur unter Windows.
 - `tests/KeyTrainer.Tests` – xUnit-Tests für Core.
-- `.github/workflows/build.yml` – Windows-Build, Tests, Single-File-.exe als Artifact.
+- `.github/workflows/build.yml` – Windows-Build, Tests, Selbsttest, Defender-Scan, Release.
+- `src/KeyTrainer/Assets/exercises.json` – Übungskatalog (in die exe eingebettet, Test `ExerciseCatalogTests` prüft ihn).
 
 ## Arbeitsweise
 - Immer nur die aktuelle Phase aus PLAN.md umsetzen.
@@ -23,4 +24,5 @@ Offene Punkte: Todo-App (`todo ls -p keytrainer`), nicht hier.
 - Übungen nur in `Assets/exercises.json`, nie im Code.
 - UI-Texte auf Deutsch, Code und Kommentare auf Englisch.
 - Das Overlay darf nie den Fokus übernehmen (WS_EX_NOACTIVATE).
-- Keine Packer, keine Obfuscation, kein Netzwerk, kein Autostart (Virenscanner).
+- Keine Packer, keine Obfuscation, kein Autostart (Virenscanner). Netzwerk nur im Update-Knopf (`Updates/Updater.cs`): HTTPS zur GitHub-API, nur auf Klick, SHA-256-Prüfung Pflicht.
+- Jeder grüne Push auf `main` wird per CI ein Release `v0.2.<run>` – das installiert der Update-Knopf. Vorher läuft `KeyTrainer.exe --selftest` auf Windows.

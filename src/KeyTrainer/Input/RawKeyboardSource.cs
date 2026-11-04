@@ -157,7 +157,7 @@ internal sealed class RawKeyboardSource : IDisposable
     }
 
     /// <summary>Characters the key produces in the foreground window's keyboard layout.</summary>
-    string? Translate(int vk, uint scanCode)
+    internal string? Translate(int vk, uint scanCode)
     {
         Array.Clear(_keyState);
         // Our own thread's key state is not reliable for background input; use what the detector tracked.

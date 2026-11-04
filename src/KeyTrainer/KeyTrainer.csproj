@@ -9,6 +9,9 @@
     <AssemblyName>KeyTrainer</AssemblyName>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <AssemblyTitle>KeyTrainer – Tastatur-Trainer</AssemblyTitle>
+    <ApplicationIcon>app.ico</ApplicationIcon>
+    <!-- WPF0001: Fluent ThemeMode is marked experimental in .NET 10 -->
+    <NoWarn>$(NoWarn);WPF0001</NoWarn>
   </PropertyGroup>
 
   <!-- Portable single .exe. No compression or trimming: packed binaries look suspicious to antivirus heuristics. -->
@@ -21,6 +24,11 @@
     <PublishTrimmed>false</PublishTrimmed>
     <DebugType>embedded</DebugType>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Resource Include="app.ico" />
+    <EmbeddedResource Include="Assets\exercises.json" LogicalName="KeyTrainer.exercises.json" />
+  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\KeyTrainer.Core\KeyTrainer.Core.csproj" />

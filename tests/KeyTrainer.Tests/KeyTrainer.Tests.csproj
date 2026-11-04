@@ -16,6 +16,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="..\..\src\KeyTrainer\Assets\exercises.json" Link="exercises.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\src\KeyTrainer.Core\KeyTrainer.Core.csproj" />
   </ItemGroup>
 

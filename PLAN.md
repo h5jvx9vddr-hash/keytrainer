@@ -320,3 +320,6 @@ Wenn ein manueller Test scheitert: Beschreibe Claude Code genau, was du gedrück
 - **Overlay:** einklappbar, bei Vollbild ausgeblendet. Trainer-Kürzel nicht mit `Strg+Alt` (= AltGr auf deutscher Tastatur).
 - **Virenscanner:** kein Packer/Obfuscator, `EnableCompressionInSingleFile` aus, saubere Assembly-Metadaten, Manifest `asInvoker`, kein Netzwerk/Autostart/Injektion; Code-Signatur (Azure Trusted Signing) in Phase 6 vorgesehen.
 - **Technik:** UWP-Fenster (Rechner, Einstellungen) über `ApplicationFrameHost` → Kindfenster auflösen; Vordergrund per `SetWinEventHook(EVENT_SYSTEM_FOREGROUND)`; `ToUnicodeEx` mit Flag `0x4` (Tottasten bleiben intakt).
+- **Overlay oben mittig** am Bildschirmrand (Nutzerwunsch 04.11.), nicht rechts.
+- **Update-Knopf:** lädt die neueste Version aus GitHub-Releases (öffentlich, Nutzerentscheidung), prüft SHA-256, tauscht die exe und startet neu.
+- **Katalog erweitert** um FISI-Themen (Konsolen, Server/AD, Kommandozeile, Terminal, Fernwartung, Linux/SSH, Büro, Alltags-Szenarien), 152 Übungen; Felder `requires`, `elevated`, `unverified`, `contexts`.

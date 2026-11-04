@@ -5,6 +5,12 @@ on:
   pull_request:
   workflow_dispatch:
 
+permissions:
+  contents: write
+
+env:
+  VERSION: 0.2.${{ github.run_number }}
+
 jobs:
   windows:
     runs-on: windows-latest
@@ -19,7 +25,14 @@ jobs:
         run: dotnet test tests/KeyTrainer.Tests -c Release
 
       - name: Publish single-file exe
-        run: dotnet publish src/KeyTrainer -c Release -o publish
+        run: dotnet publish src/KeyTrainer -c Release -o publish -p:Version=${{ env.VERSION }}
+
+      - name: Self-test of the exe
+        shell: pwsh
+        run: |
+          $p = Start-Process -FilePath publish\KeyTrainer.exe -ArgumentList '--selftest' -Wait -PassThru
+          Get-Content "$env:APPDATA\KeyTrainer\logs\*.log" -ErrorAction SilentlyContinue
+          if ($p.ExitCode -ne 0) { Write-Error "Self-test failed with exit code $($p.ExitCode)"; exit 1 }
 
       - name: Defender scan
         shell: pwsh
@@ -30,7 +43,27 @@ jobs:
           & $mp.FullName -Scan -ScanType 3 -File "$PWD\publish\KeyTrainer.exe" -DisableRemediation
           if ($LASTEXITCODE -eq 2) { Write-Error "Defender flagged KeyTrainer.exe"; exit 1 }
 
+      - name: Checksum
+        shell: pwsh
+        run: |
+          $hash = (Get-FileHash publish\KeyTrainer.exe -Algorithm SHA256).Hash.ToLower()
+          "$hash  KeyTrainer.exe" | Out-File -Encoding ascii -NoNewline publish\KeyTrainer.exe.sha256
+          Write-Host "SHA-256: $hash"
+
       - uses: actions/upload-artifact@v7
         with:
           name: KeyTrainer
-          path: publish/KeyTrainer.exe
+          path: |
+            publish/KeyTrainer.exe
+            publish/KeyTrainer.exe.sha256
+
+      # Every green build on main becomes the release the in-app update button installs.
+      - name: Release
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "v$env:VERSION" publish/KeyTrainer.exe publish/KeyTrainer.exe.sha256 `
+            --target $env:GITHUB_SHA --title "KeyTrainer $env:VERSION" `
+            --notes "Automatischer Build von $($env:GITHUB_SHA.Substring(0,7)). Update im Trainer über „Nach Updates suchen“."

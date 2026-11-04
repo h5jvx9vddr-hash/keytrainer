@@ -24,7 +24,8 @@ public class ComboTests
     [InlineData("Strg+3", "Strg+3")]
     [InlineData("Win", "Win")]
     [InlineData("enter", "Enter")]
-    [InlineData("Num +", "Num +")]
+    [InlineData("Num +", "Num Plus")]
+    [InlineData("Strg+Num Plus", "Strg+Num Plus")]
     public void Normalize_AcceptsAliasesAndAnyOrder(string input, string expected)
     {
         Assert.Equal(expected, Combo.Normalize(input));
@@ -48,5 +49,17 @@ public class ComboTests
         Assert.Equal("F10", KeyNames.Name(Vk.F1 + 9));
         Assert.Equal("Num 5", KeyNames.Name(Vk.NumPad0 + 5));
         Assert.Equal("Plus", KeyNames.Name(Vk.OemPlus));
+    }
+}
+
+public class ComboNamesTests
+{
+    [Theory]
+    [InlineData("Win+Strg+D", new[] { "Win", "Strg", "D" })]
+    [InlineData("Strg+Num Plus", new[] { "Strg", "Num Plus" })]
+    [InlineData("Win", new[] { "Win" })]
+    public void Names_SplitsIntoKeyCaps(string combo, string[] expected)
+    {
+        Assert.Equal(expected, Combo.Parse(combo).Names());
     }
 }

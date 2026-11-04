@@ -82,7 +82,9 @@ internal static class NativeMethods
     [DllImport("user32.dll")]
     public static extern short GetKeyState(int vk);
 
-    [DllImport("user32.dll")]
+    // CharSet.Unicode is required: the buffer receives UTF-16 chars. Without it char[] is marshalled
+    // as 1-byte ANSI and the API writes past the buffer (heap corruption, "Unknown Hard Error").
+    [DllImport("user32.dll", CharSet = CharSet.Unicode)]
     public static extern int ToUnicodeEx(
         uint vk, uint scanCode, byte[] keyState,
         [Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 4)] char[] buffer,

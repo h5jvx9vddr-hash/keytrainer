@@ -40,14 +40,17 @@ public readonly partial record struct Combo(Mods Mods, string Key)
         ["Umschalt"] = Mods.Shift,
     };
 
-    public override string ToString()
+    /// <summary>Key names in display order, e.g. ["Win", "Strg", "D"].</summary>
+    public IReadOnlyList<string> Names()
     {
         var parts = new List<string>(5);
         foreach (var (mod, name) in Order)
             if (Mods.HasFlag(mod)) parts.Add(name);
         if (Key.Length > 0) parts.Add(Key);
-        return string.Join("+", parts);
+        return parts;
     }
+
+    public override string ToString() => string.Join("+", Names());
 
     /// <summary>Parses any accepted spelling, e.g. "shift + ctrl + t" or "Alt+Shift++".</summary>
     public static Combo Parse(string text)

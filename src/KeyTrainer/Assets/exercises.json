@@ -1,0 +1,3523 @@
+{
+  "_doc": [
+    "Übungskatalog des KeyTrainers. Neue Übungen nur hier eintragen.",
+    "mode: keys | keysAndResult | result | scenario (mit steps).",
+    "expect.sequence: Kombinationen in beliebiger Schreibweise ('Strg+Shift+T') oder 'text:…' (Groß/Klein egal, '*' = beliebig).",
+    "verify: process ('a.exe|b.exe'), windowClass, titleRegex, practiceTitle, sessionLock, processRestarted, uiaSelected, timeoutMs.",
+    "context: Name aus 'contexts' – dieses Fenster muss im Vordergrund sein.",
+    "hints: Tipps in steigender Deutlichkeit; danach zeigt der Trainer automatisch die erste Taste und dann die Lösung.",
+    "elevated: UAC/Admin-Fenster – dort sieht der Trainer keine Tasten. unverified: auf echtem Windows noch nicht bestätigt.",
+    "Fenstertitel gelten für ein deutsches Windows 11."
+  ],
+  "version": 1,
+  "contexts": {
+    "explorer": {
+      "process": "explorer.exe",
+      "windowClass": "CabinetWClass"
+    },
+    "terminal": {
+      "process": "WindowsTerminal.exe|cmd.exe|powershell.exe|pwsh.exe|conhost.exe|OpenConsole.exe"
+    },
+    "windowsTerminal": {
+      "process": "WindowsTerminal.exe"
+    },
+    "cmd": {
+      "process": "WindowsTerminal.exe|cmd.exe|conhost.exe|OpenConsole.exe",
+      "titleRegex": "Eingabeaufforderung|cmd\\.exe"
+    },
+    "powershell": {
+      "process": "WindowsTerminal.exe|powershell.exe|pwsh.exe|conhost.exe|OpenConsole.exe",
+      "titleRegex": "PowerShell"
+    },
+    "browser": {
+      "process": "msedge.exe|chrome.exe|firefox.exe|brave.exe"
+    },
+    "practice": {
+      "process": "msedge.exe|chrome.exe|firefox.exe|brave.exe",
+      "titleRegex": "KeyTrainer-Übungsseite|KT-OK-"
+    },
+    "services": {
+      "process": "mmc.exe",
+      "titleRegex": "Dienste"
+    },
+    "rdp": {
+      "process": "mstsc.exe"
+    },
+    "vmconsole": {
+      "process": "vmware.exe|vmplayer.exe|vmconnect.exe"
+    },
+    "outlook": {
+      "process": "OUTLOOK.EXE|olk.exe"
+    },
+    "teams": {
+      "process": "ms-teams.exe|Teams.exe"
+    }
+  },
+  "exercises": [
+    {
+      "id": "basis-rechner",
+      "category": "Basis",
+      "level": 1,
+      "prompt": "Öffne das Startmenü und starte den Rechner – nur mit der Tastatur",
+      "hints": [
+        "Die Windows-Taste allein öffnet das Startmenü, dort kannst du sofort tippen"
+      ],
+      "solution": "Win, „rechner“, Enter",
+      "mode": "keysAndResult",
+      "expect": {
+        "sequence": [
+          "Win",
+          "text:rechner",
+          "Enter"
+        ]
+      },
+      "verify": {
+        "process": "CalculatorApp.exe"
+      }
+    },
+    {
+      "id": "basis-alt-tab",
+      "category": "Basis",
+      "level": 1,
+      "prompt": "Wechsle zum vorherigen Fenster",
+      "hints": [
+        "Alt gedrückt halten"
+      ],
+      "solution": "Alt + Tab",
+      "mode": "keys",
+      "expect": {
+        "sequence": [
+          "Alt+Tab"
+        ]
+      }
+    },
+    {
+      "id": "basis-alt-f4",
+      "category": "Basis",
+      "level": 1,
+      "prompt": "Schließe das aktive Fenster",
+      "hints": [
+        "Alt und eine Funktionstaste"
+      ],
+      "solution": "Alt + F4",
+      "mode": "keys",
+      "expect": {
+        "sequence": [
+          "Alt+F4"
+        ]
+      },
+      "explainWrong": {
+        "Strg+F4": "Strg + F4 schließt nur den aktuellen Tab/das Dokument, nicht das Fenster"
+      }
+    },
+    {
+      "id": "basis-kontextmenue",
+      "category": "Basis",
+      "level": 1,
+      "prompt": "Öffne das Kontextmenü (wie Rechtsklick)",
+      "hints": [
+        "Shift und eine Funktionstaste – oder die Menü-Taste neben der rechten Strg-Taste"
+      ],
+      "solution": "Shift + F10 oder Menü-Taste",
+      "mode": "keys",
+      "expect": {
+        "sequence": [
+          "Shift+F10"
+        ],
+        "alternatives": [
+          [
+            "Menü"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "basis-desktop",
+      "category": "Basis",
+      "level": 1,
+      "prompt": "Zeige den Desktop an",
+      "hints": [
+        "Windows-Taste plus D wie Desktop"
+      ],
+      "solution": "Win + D",
+      "mode": "keys",
+      "expect": {
+        "sequence": [
+          "Win+D"
+        ]
+      },
+      "explainWrong": {
+        "Win+M": "Win + M minimiert alle Fenster, lässt sich aber nicht mit derselben Taste rückgängig machen"
+      }
+    },
+    {
+      "id": "basis-taskleiste-1",
+      "category": "Basis",
+      "level": 1,
+      "prompt": "Öffne das Programm auf Platz 1 der Taskleiste",
+      "hints": [
+        "Windows-Taste plus Zahl"
+      ],
+      "solution": "Win + 1",
+      "mode": "keys",
+      "expect": {
+        "sequence": [
+          "Win+1"
+        ]
+      }
+    },
+    {
+      "id": "basis-suche",
+      "category": "Basis",
+      "level": 1,
+      "prompt": "Öffne die Windows-Suche",
+      "hints": [
+        "S wie Suche"
+      ],
+      "solution": "Win + S",
+      "mode": "keys",
+      "expect": {
+        "sequence": [
+          "Win+S"
+        ]
+      }
+    },
+    {
+      "id": "basis-explorer-schnelllink",
+      "category": "Basis",
+      "level": 1,
+      "prompt": "Öffne das Schnelllink-Menü (Rechtsklick auf Start)",
+      "hints": [
+        "Windows-Taste plus X"
+      ],
+      "solution": "Win + X",
+      "mode": "keys",
+      "expect": {
+        "sequence": [
+          "Win+X"
+        ]
+      }
+    },
+    {
+      "id": "fenster-links",
+      "category": "Fenster",
+      "level": 1,
+      "prompt": "Docke das Fenster links an",
+      "hints": [
+        "Windows-Taste plus Pfeil"
+      ],
+      "solution": "Win + Pfeil links",
+      "mode": "keys",
+      "expect": {
+        "sequence": [
+          "Win+Pfeil links"
+        ]
+      }
+    },
+    {
+      "id": "fenster-max",
+      "category": "Fenster",
+      "level": 1,
+      "prompt": "Maximiere das Fenster",
+      "hints": [
+        "Windows-Taste plus Pfeil"
+      ],
+      "solution": "Win + Pfeil hoch",
+      "mode": "keys",
+      "expect": {
+        "sequence": [
+          "Win+Pfeil hoch"
+        ]
+      }
+    },
+    {
+      "id": "fenster-monitor",
+      "category": "Fenster",
+      "level": 2,
+      "prompt": "Verschiebe das Fenster auf den anderen Monitor",
+      "hints": [
+        "Wie Andocken, nur mit Shift zusätzlich"
+      ],
+      "solution": "Win + Shift + Pfeil links/rechts",
+      "mode": "keys",
+      "expect": {
+        "sequence": [
+          "Win+Shift+Pfeil rechts"
+        ],
+        "alternatives": [
+          [
+            "Win+Shift+Pfeil links"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "fenster-desktop-neu",
+      "category": "Fenster",
+      "level": 2,
+      "prompt": "Lege einen neuen virtuellen Desktop an",
+      "hints": [
+        "Win und Strg zusammen, dann D"
+      ],
+      "solution": "Win + Strg + D",
+      "mode": "keys",
+      "expect": {
+        "sequence": [
+          "Win+Strg+D"
+        ]
+      }
+    },
+    {
+      "id": "fenster-desktop-wechsel",
+      "category": "Fenster",
+      "level": 2,
+      "prompt": "Wechsle zum nächsten virtuellen Desktop",
+      "hints": [
+        "Win und Strg halten, dann Pfeil"
+      ],
+      "solution": "Win + Strg + Pfeil rechts",
+      "mode": "keys",
+      "expect": {
+        "sequence": [
+          "Win+Strg+Pfeil rechts"
+        ],
+        "alternatives": [
+          [
+            "Win+Strg+Pfeil links"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "fenster-desktop-schliessen",
+      "category": "Fenster",
+      "level": 2,
+      "prompt": "Schließe den aktuellen virtuellen Desktop",
+      "hints": [
+        "Wie Fenster schließen, nur mit Win + Strg"
+      ],
+      "solution": "Win + Strg + F4",
+      "mode": "keys",
+      "expect": {
+        "sequence": [
+          "Win+Strg+F4"
+        ]
+      }
+    },
+    {
+      "id": "fenster-aufgabenansicht",
+      "category": "Fenster",
+      "level": 1,
+      "prompt": "Öffne die Aufgabenansicht",
+      "hints": [
+        "Windows-Taste plus Tab"
+      ],
+      "solution": "Win + Tab",
+      "mode": "keys",
+      "expect": {
+        "sequence": [
+          "Win+Tab"
+        ]
+      }
+    },
+    {
+      "id": "fenster-alle-minimieren",
+      "category": "Fenster",
+      "level": 3,
+      "prompt": "Minimiere alle Fenster außer dem aktiven",
+      "hints": [
+        "Windows-Taste plus Pos1"
+      ],
+      "solution": "Win + Pos1",
+      "mode": "keys",
+      "expect": {
+        "sequence": [
+          "Win+Pos1"
+        ]
+      },
+      "unverified": true
+    },
+    {
+      "id": "text-wortsprung",
+      "category": "Text",
+      "level": 1,
+      "prompt": "Springe wortweise durch den Text",
+      "hints": [
+        "Strg macht Pfeiltasten wortweise"
+      ],
+      "solution": "Strg + Pfeil rechts/links",
+      "mode": "keys",
+      "expect": {
+        "sequence": [
+          "Strg+Pfeil rechts"
+        ],
+        "alternatives": [
+          [
+            "Strg+Pfeil links"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "text-wort-markieren",
+      "category": "Text",
+      "level": 2,
+      "prompt": "Markiere das nächste Wort",
+      "hints": [
+        "Wortweise springen plus Shift zum Markieren"
+      ],
+      "solution": "Strg + Shift + Pfeil rechts",
+      "mode": "keys",
+      "expect": {
+        "sequence": [
+          "Strg+Shift+Pfeil rechts"
+        ],
+        "alternatives": [
+          [
+            "Strg+Shift+Pfeil links"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "text-wort-loeschen",
+      "category": "Text",
+      "level": 1,
+      "prompt": "Lösche das Wort links vom Cursor",
+      "hints": [
+        "Strg macht die Rücktaste wortweise"
+      ],
+      "solution": "Strg + Rücktaste",
+      "mode": "keys",
+      "expect": {
+        "sequence": [
+          "Strg+Rücktaste"
+        ]
+      }
+    },
+    {
+      "id": "text-zeilenende-markieren",
+      "category": "Text",
+      "level": 1,
+      "prompt": "Markiere bis zum Zeilenende",
+      "hints": [
+        "Shift markiert, Ende springt"
+      ],
+      "solution": "Shift + Ende",
+      "mode": "keys",
+      "expect": {
+        "sequence": [
+          "Shift+Ende"
+        ]
+      }
+    },
+    {
+      "id": "text-alles-markieren",
+      "category": "Text",
+      "level": 1,
+      "prompt": "Markiere alles",
+      "hints": [
+        "A wie alles"
+      ],
+      "solution": "Strg + A",
+      "mode": "keys",
+      "expect": {
+        "sequence": [
+          "Strg+A"
+        ]
+      }
+    },
+    {
+      "id": "text-rueckgaengig",
+      "category": "Text",
+      "level": 1,
+      "prompt": "Mache die letzte Änderung rückgängig",
+      "hints": [
+        "Strg plus Z"
+      ],
+      "solution": "Strg + Z",
+      "mode": "keys",
+      "expect": {
+        "sequence": [
+          "Strg+Z"
+        ]
+      }
+    },
+    {
+      "id": "text-zwischenablage",
+      "category": "Text",
+      "level": 1,
+      "prompt": "Öffne den Zwischenablage-Verlauf",
+      "hints": [
+        "Wie Einfügen, nur mit der Windows-Taste"
+      ],
+      "solution": "Win + V",
+      "mode": "keys",
+      "expect": {
+        "sequence": [
+          "Win+V"
+        ]
+      }
+    },
+    {
+      "id": "text-screenshot",
+      "category": "Text",
+      "level": 1,
+      "prompt": "Mache einen Screenshot von einem Ausschnitt",
+      "hints": [
+        "Windows-Taste, Shift und S wie Screenshot"
+      ],
+      "solution": "Win + Shift + S",
+      "mode": "keys",
+      "expect": {
+        "sequence": [
+          "Win+Shift+S"
+        ]
+      }
+    },
+    {
+      "id": "text-emoji",
+      "category": "Text",
+      "level": 2,
+      "prompt": "Öffne die Emoji- und Sonderzeichen-Auswahl",
+      "hints": [
+        "Windows-Taste plus Satzzeichen"
+      ],
+      "solution": "Win + Punkt",
+      "mode": "keys",
+      "expect": {
+        "sequence": [
+          "Win+Punkt"
+        ]
+      }
+    },
+    {
+      "id": "explorer-oeffnen",
+      "category": "Explorer",
+      "level": 1,
+      "prompt": "Öffne den Explorer",
+      "hints": [
+        "E wie Explorer"
+      ],
+      "solution": "Win + E",
+      "mode": "keysAndResult",
+      "expect": {
+        "sequence": [
+          "Win+E"
+        ]
+      },
+      "verify": {
+        "windowClass": "CabinetWClass"
+      }
+    },
+    {
+      "id": "explorer-adressleiste",
+      "category": "Explorer",
+      "level": 1,
+      "prompt": "Springe im Explorer in die Adressleiste",
+      "hints": [
+        "L wie Location"
+      ],
+      "solution": "Strg + L (oder Alt + D)",
+      "mode": "keys",
+      "expect": {
+        "sequence": [
+          "Strg+L"
+        ],
+        "alternatives": [
+          [
+            "Alt+D"
+          ],
+          [
+            "F4"
+          ]
+        ]
+      },
+      "context": "explorer"
+    },
+    {
+      "id": "explorer-hoch",
+      "category": "Explorer",
+      "level": 1,
+      "prompt": "Gehe einen Ordner nach oben",
+      "hints": [
+        "Alt plus Pfeil"
+      ],
+      "solution": "Alt + Pfeil hoch",
+      "mode": "keys",
+      "expect": {
+        "sequence": [
+          "Alt+Pfeil hoch"
+        ]
+      },
+      "context": "explorer",
+      "explainWrong": {
+        "Rücktaste": "Die Rücktaste geht im Verlauf zurück, nicht unbedingt eine Ebene nach oben"
+      }
+    },
+    {
+      "id": "explorer-umbenennen",
+      "category": "Explorer",
+      "level": 1,
+      "prompt": "Benenne die markierte Datei um",
+      "hints": [
+        "Eine Funktionstaste"
+      ],
+      "solution": "F2",
+      "mode": "keys",
+      "expect": {
+        "sequence": [
+          "F2"
+        ]
+      },
+      "context": "explorer"
+    },
+    {
+      "id": "explorer-eigenschaften",
+      "category": "Explorer",
+      "level": 1,
+      "prompt": "Öffne die Eigenschaften der markierten Datei",
+      "hints": [
+        "Alt plus Enter"
+      ],
+      "solution": "Alt + Enter",
+      "mode": "keysAndResult",
+      "expect": {
+        "sequence": [
+          "Alt+Enter"
+        ]
+      },
+      "verify": {
+        "titleRegex": "Eigenschaften"
+      },
+      "context": "explorer"
+    },
+    {
+      "id": "explorer-neuer-ordner",
+      "category": "Explorer",
+      "level": 1,
+      "prompt": "Lege einen neuen Ordner an",
+      "hints": [
+        "N wie neu – mit Shift für Ordner"
+      ],
+      "solution": "Strg + Shift + N",
+      "mode": "keys",
+      "expect": {
+        "sequence": [
+          "Strg+Shift+N"
+        ]
+      },
+      "context": "explorer"
+    },
+    {
+      "id": "explorer-neues-fenster",
+      "category": "Explorer",
+      "level": 1,
+      "prompt": "Öffne ein neues Explorer-Fenster vom aktuellen Ordner",
+      "hints": [
+        "N wie neu"
+      ],
+      "solution": "Strg + N",
+      "mode": "keys",
+      "expect": {
+        "sequence": [
+          "Strg+N"
+        ]
+      },
+      "context": "explorer"
+    },
+    {
+      "id": "explorer-suche",
+      "category": "Explorer",
+      "level": 1,
+      "prompt": "Springe ins Suchfeld des Explorers",
+      "hints": [
+        "E oder F"
+      ],
+      "solution": "Strg + E (oder Strg + F)",
+      "mode": "keys",
+      "expect": {
+        "sequence": [
+          "Strg+E"
+        ],
+        "alternatives": [
+          [
+            "Strg+F"
+          ]
+        ]
+      },
+      "context": "explorer"
+    },
+    {
+      "id": "explorer-neuer-tab",
+      "category": "Explorer",
+      "level": 2,
+      "prompt": "Öffne einen neuen Explorer-Tab",
+      "hints": [
+        "Wie im Browser"
+      ],
+      "solution": "Strg + T",
+      "mode": "keys",
+      "expect": {
+        "sequence": [
+          "Strg+T"
+        ]
+      },
+      "context": "explorer"
+    },
+    {
+      "id": "admin-ausfuehren",
+      "category": "Admin",
+      "level": 1,
+      "prompt": "Öffne den Ausführen-Dialog",
+      "hints": [
+        "R wie Run"
+      ],
+      "solution": "Win + R",
+      "mode": "keysAndResult",
+      "expect": {
+        "sequence": [
+          "Win+R"
+        ]
+      },
+      "verify": {
+        "windowClass": "#32770",
+        "titleRegex": "^Ausführen$"
+      }
+    },
+    {
+      "id": "admin-dienste",
+      "category": "Admin",
+      "level": 2,
+      "prompt": "Öffne die Dienste-Verwaltung",
+      "hints": [
+        "Ausführen-Dialog öffnen und den Befehl eintippen",
+        "Der Befehl endet auf .msc"
+      ],
+      "solution": "Win + R, services.msc, Enter",
+      "mode": "keysAndResult",
+      "expect": {
+        "sequence": [
+          "Win+R",
+          "text:services.msc",
+          "Enter"
+        ]
+      },
+      "verify": {
+        "process": "mmc.exe",
+        "titleRegex": "Dienste"
+      }
+    },
+    {
+      "id": "admin-ereignisanzeige",
+      "category": "Admin",
+      "level": 2,
+      "prompt": "Öffne die Ereignisanzeige",
+      "hints": [
+        "Ausführen-Dialog öffnen und den Befehl eintippen",
+        "event viewer abgekürzt"
+      ],
+      "solution": "Win + R, eventvwr.msc, Enter",
+      "mode": "keysAndResult",
+      "expect": {
+        "sequence": [
+          "Win+R",
+          "text:eventvwr.msc",
+          "Enter"
+        ]
+      },
+      "verify": {
+        "process": "mmc.exe",
+        "titleRegex": "Ereignisanzeige"
+      }
+    },
+    {
+      "id": "admin-computerverwaltung",
+      "category": "Admin",
+      "level": 2,
+      "prompt": "Öffne die Computerverwaltung",
+      "hints": [
+        "Ausführen-Dialog öffnen und den Befehl eintippen",
+        "computer management abgekürzt"
+      ],
+      "solution": "Win + R, compmgmt.msc, Enter",
+      "mode": "keysAndResult",
+      "expect": {
+        "sequence": [
+          "Win+R",
+          "text:compmgmt.msc",
+          "Enter"
+        ]
+      },
+      "verify": {
+        "process": "mmc.exe",
+        "titleRegex": "Computerverwaltung"
+      }
+    },
+    {
+      "id": "admin-geraetemanager",
+      "category": "Admin",
+      "level": 2,
+      "prompt": "Öffne den Geräte-Manager",
+      "hints": [
+        "Ausführen-Dialog öffnen und den Befehl eintippen",
+        "device management abgekürzt"
+      ],
+      "solution": "Win + R, devmgmt.msc, Enter",
+      "mode": "keysAndResult",
+      "expect": {
+        "sequence": [
+          "Win+R",
+          "text:devmgmt.msc",
+          "Enter"
+        ]
+      },
+      "verify": {
+        "process": "mmc.exe",
+        "titleRegex": "Geräte-Manager"
+      }
+    },
+    {
+      "id": "admin-datentraeger",
+      "category": "Admin",
+      "level": 2,
+      "prompt": "Öffne die Datenträgerverwaltung",
+      "hints": [
+        "Ausführen-Dialog öffnen und den Befehl eintippen",
+        "disk management abgekürzt"
+      ],
+      "solution": "Win + R, diskmgmt.msc, Enter",
+      "mode": "keysAndResult",
+      "expect": {
+        "sequence": [
+          "Win+R",
+          "text:diskmgmt.msc",
+          "Enter"
+        ]
+      },
+      "verify": {
+        "process": "mmc.exe",
+        "titleRegex": "Datenträgerverwaltung",
+        "timeoutMs": 20000
+      },
+      "elevated": true
+    },
+    {
+      "id": "admin-benutzer",
+      "category": "Admin",
+      "level": 2,
+      "prompt": "Öffne „Lokale Benutzer und Gruppen“",
+      "hints": [
+        "Ausführen-Dialog öffnen und den Befehl eintippen",
+        "local user manager abgekürzt"
+      ],
+      "solution": "Win + R, lusrmgr.msc, Enter",
+      "mode": "keysAndResult",
+      "expect": {
+        "sequence": [
+          "Win+R",
+          "text:lusrmgr.msc",
+          "Enter"
+        ]
+      },
+      "verify": {
+        "process": "mmc.exe",
+        "titleRegex": "Lokale Benutzer|lusrmgr"
+      },
+      "requires": {
+        "anyFile": [
+          "%SystemRoot%\\System32\\lusrmgr.msc"
+        ],
+        "note": "Nur in Windows Pro/Enterprise vorhanden"
+      }
+    },
+    {
+      "id": "admin-netzwerkadapter",
+      "category": "Admin",
+      "level": 2,
+      "prompt": "Öffne die Netzwerkverbindungen (Adapter)",
+      "hints": [
+        "Ausführen-Dialog öffnen und den Befehl eintippen",
+        "Systemsteuerungs-Datei, endet auf .cpl"
+      ],
+      "solution": "Win + R, ncpa.cpl, Enter",
+      "mode": "keysAndResult",
+      "expect": {
+        "sequence": [
+          "Win+R",
+          "text:ncpa.cpl",
+          "Enter"
+        ]
+      },
+      "verify": {
+        "titleRegex": "Netzwerkverbindungen"
+      }
+    },
+    {
+      "id": "admin-programme",
+      "category": "Admin",
+      "level": 2,
+      "prompt": "Öffne „Programme und Features“",
+      "hints": [
+        "Ausführen-Dialog öffnen und den Befehl eintippen",
+        "application wizard abgekürzt"
+      ],
+      "solution": "Win + R, appwiz.cpl, Enter",
+      "mode": "keysAndResult",
+      "expect": {
+        "sequence": [
+          "Win+R",
+          "text:appwiz.cpl",
+          "Enter"
+        ]
+      },
+      "verify": {
+        "titleRegex": "Programme und Features"
+      }
+    },
+    {
+      "id": "admin-systemeigenschaften",
+      "category": "Admin",
+      "level": 2,
+      "prompt": "Öffne die Systemeigenschaften",
+      "hints": [
+        "Ausführen-Dialog öffnen und den Befehl eintippen",
+        "system dialog manager abgekürzt"
+      ],
+      "solution": "Win + R, sysdm.cpl, Enter",
+      "mode": "keysAndResult",
+      "expect": {
+        "sequence": [
+          "Win+R",
+          "text:sysdm.cpl",
+          "Enter"
+        ]
+      },
+      "verify": {
+        "titleRegex": "Systemeigenschaften"
+      }
+    },
+    {
+      "id": "admin-msinfo",
+      "category": "Admin",
+      "level": 2,
+      "prompt": "Öffne die Systeminformationen",
+      "hints": [
+        "Ausführen-Dialog öffnen und den Befehl eintippen",
+        "ms info 32"
+      ],
+      "solution": "Win + R, msinfo32, Enter",
+      "mode": "keysAndResult",
+      "expect": {
+        "sequence": [
+          "Win+R",
+          "text:msinfo32",
+          "Enter"
+        ]
+      },
+      "verify": {
+        "process": "msinfo32.exe"
+      }
+    },
+    {
+      "id": "admin-taskmanager",
+      "category": "Admin",
+      "level": 1,
+      "prompt": "Öffne den Task-Manager direkt",
+      "hints": [
+        "Strg, Shift und Escape"
+      ],
+      "solution": "Strg + Shift + Esc",
+      "mode": "keysAndResult",
+      "expect": {
+        "sequence": [
+          "Strg+Shift+Esc"
+        ]
+      },
+      "verify": {
+        "process": "Taskmgr.exe"
+      },
+      "explainWrong": {
+        "Strg+Alt+Entf": "Das geht auch, aber über den Sicherheitsbildschirm – Strg + Shift + Esc ist direkt"
+      }
+    },
+    {
+      "id": "admin-terminal-admin",
+      "category": "Admin",
+      "level": 2,
+      "prompt": "Öffne das Terminal als Administrator",
+      "hints": [
+        "Erst das Schnelllink-Menü, dann ein Buchstabe"
+      ],
+      "solution": "Win + X, A",
+      "mode": "keysAndResult",
+      "expect": {
+        "sequence": [
+          "Win+X",
+          "text:a"
+        ]
+      },
+      "verify": {
+        "process": "WindowsTerminal.exe",
+        "timeoutMs": 20000
+      },
+      "elevated": true
+    },
+    {
+      "id": "admin-terminal",
+      "category": "Admin",
+      "level": 1,
+      "prompt": "Öffne das Terminal (ohne Admin)",
+      "hints": [
+        "Schnelllink-Menü, dann ein Buchstabe"
+      ],
+      "solution": "Win + X, I",
+      "mode": "keysAndResult",
+      "expect": {
+        "sequence": [
+          "Win+X",
+          "text:i"
+        ]
+      },
+      "verify": {
+        "process": "WindowsTerminal.exe"
+      }
+    },
+    {
+      "id": "admin-als-admin-starten",
+      "category": "Admin",
+      "level": 3,
+      "prompt": "Starte ein Programm aus der Suche als Administrator",
+      "hints": [
+        "Startmenü, Namen tippen – und statt Enter eine Kombination mit Enter"
+      ],
+      "solution": "Win, Name, Strg + Shift + Enter",
+      "mode": "keys",
+      "expect": {
+        "sequence": [
+          "Win",
+          "text:*",
+          "Strg+Shift+Enter"
+        ]
+      },
+      "elevated": true
+    },
+    {
+      "id": "admin-einstellungen",
+      "category": "Admin",
+      "level": 1,
+      "prompt": "Öffne die Einstellungen",
+      "hints": [
+        "I wie Settings-Zahnrad"
+      ],
+      "solution": "Win + I",
+      "mode": "keysAndResult",
+      "expect": {
+        "sequence": [
+          "Win+I"
+        ]
+      },
+      "verify": {
+        "process": "SystemSettings.exe",
+        "titleRegex": "Einstellungen"
+      }
+    },
+    {
+      "id": "admin-remotedesktop",
+      "category": "Admin",
+      "level": 2,
+      "prompt": "Öffne die Remotedesktopverbindung",
+      "hints": [
+        "Ausführen-Dialog öffnen und den Befehl eintippen",
+        "Microsoft Terminal Services Client"
+      ],
+      "solution": "Win + R, mstsc, Enter",
+      "mode": "keysAndResult",
+      "expect": {
+        "sequence": [
+          "Win+R",
+          "text:mstsc",
+          "Enter"
+        ]
+      },
+      "verify": {
+        "process": "mstsc.exe"
+      }
+    },
+    {
+      "id": "admin-sperren",
+      "category": "Admin",
+      "level": 1,
+      "prompt": "Sperre den PC",
+      "hints": [
+        "L wie Lock"
+      ],
+      "solution": "Win + L",
+      "mode": "result",
+      "verify": {
+        "sessionLock": true,
+        "timeoutMs": 10000
+      }
+    },
+    {
+      "id": "admin-systemsteuerung",
+      "category": "Admin",
+      "level": 1,
+      "prompt": "Öffne die klassische Systemsteuerung",
+      "hints": [
+        "Ausführen-Dialog öffnen und den Befehl eintippen"
+      ],
+      "solution": "Win + R, control, Enter",
+      "mode": "keysAndResult",
+      "expect": {
+        "sequence": [
+          "Win+R",
+          "text:control",
+          "Enter"
+        ]
+      },
+      "verify": {
+        "titleRegex": "Systemsteuerung|Alle Systemsteuerungselemente"
+      }
+    },
+    {
+      "id": "konsole-aufgabenplanung",
+      "category": "Konsolen",
+      "level": 2,
+      "prompt": "Öffne die Aufgabenplanung",
+      "hints": [
+        "Ausführen-Dialog öffnen und den Befehl eintippen",
+        "task scheduler abgekürzt"
+      ],
+      "solution": "Win + R, taskschd.msc, Enter",
+      "mode": "keysAndResult",
+      "expect": {
+        "sequence": [
+          "Win+R",
+          "text:taskschd.msc",
+          "Enter"
+        ]
+      },
+      "verify": {
+        "process": "mmc.exe",
+        "titleRegex": "Aufgabenplanung"
+      }
+    },
+    {
+      "id": "konsole-gpedit",
+      "category": "Konsolen",
+      "level": 2,
+      "prompt": "Öffne den Editor für lokale Gruppenrichtlinien",
+      "hints": [
+        "Ausführen-Dialog öffnen und den Befehl eintippen",
+        "group policy editor"
+      ],
+      "solution": "Win + R, gpedit.msc, Enter",
+      "mode": "keysAndResult",
+      "expect": {
+        "sequence": [
+          "Win+R",
+          "text:gpedit.msc",
+          "Enter"
+        ]
+      },
+      "verify": {
+        "process": "mmc.exe",
+        "titleRegex": "Gruppenrichtlinien",
+        "timeoutMs": 20000
+      },
+      "elevated": true,
+      "requires": {
+        "anyFile": [
+          "%SystemRoot%\\System32\\gpedit.msc"
+        ],
+        "note": "Nur in Windows Pro/Enterprise vorhanden"
+      }
+    },
+    {
+      "id": "konsole-firewall",
+      "category": "Konsolen",
+      "level": 2,
+      "prompt": "Öffne die Windows-Firewall mit erweiterter Sicherheit",
+      "hints": [
+        "Ausführen-Dialog öffnen und den Befehl eintippen",
+        "windows firewall – zwei Buchstaben"
+      ],
+      "solution": "Win + R, wf.msc, Enter",
+      "mode": "keysAndResult",
+      "expect": {
+        "sequence": [
+          "Win+R",
+          "text:wf.msc",
+          "Enter"
+        ]
+      },
+      "verify": {
+        "process": "mmc.exe",
+        "titleRegex": "Firewall",
+        "timeoutMs": 20000
+      },
+      "elevated": true
+    },
+    {
+      "id": "konsole-druckverwaltung",
+      "category": "Konsolen",
+      "level": 2,
+      "prompt": "Öffne die Druckverwaltung",
+      "hints": [
+        "Ausführen-Dialog öffnen und den Befehl eintippen",
+        "Englisch: print management"
+      ],
+      "solution": "Win + R, printmanagement.msc, Enter",
+      "mode": "keysAndResult",
+      "expect": {
+        "sequence": [
+          "Win+R",
+          "text:printmanagement.msc",
+          "Enter"
+        ]
+      },
+      "verify": {
+        "process": "mmc.exe",
+        "titleRegex": "Druckverwaltung",
+        "timeoutMs": 20000
+      },
+      "elevated": true,
+      "requires": {
+        "anyFile": [
+          "%SystemRoot%\\System32\\printmanagement.msc"
+        ],
+        "note": "Optionales Feature „Druckverwaltungskonsole“ installieren"
+      }
+    },
+    {
+      "id": "konsole-zertifikate",
+      "category": "Konsolen",
+      "level": 2,
+      "prompt": "Öffne die Zertifikate des aktuellen Benutzers",
+      "hints": [
+        "Ausführen-Dialog öffnen und den Befehl eintippen",
+        "certificate manager"
+      ],
+      "solution": "Win + R, certmgr.msc, Enter",
+      "mode": "keysAndResult",
+      "expect": {
+        "sequence": [
+          "Win+R",
+          "text:certmgr.msc",
+          "Enter"
+        ]
+      },
+      "verify": {
+        "process": "mmc.exe",
+        "titleRegex": "Zertifikate|certmgr"
+      }
+    },
+    {
+      "id": "konsole-zertifikate-computer",
+      "category": "Konsolen",
+      "level": 3,
+      "prompt": "Öffne die Zertifikate des Computers",
+      "hints": [
+        "Ausführen-Dialog öffnen und den Befehl eintippen",
+        "certificates local machine"
+      ],
+      "solution": "Win + R, certlm.msc, Enter",
+      "mode": "keysAndResult",
+      "expect": {
+        "sequence": [
+          "Win+R",
+          "text:certlm.msc",
+          "Enter"
+        ]
+      },
+      "verify": {
+        "process": "mmc.exe",
+        "titleRegex": "Zertifikate|certlm",
+        "timeoutMs": 20000
+      },
+      "elevated": true
+    },
+    {
+      "id": "konsole-ressourcenmonitor",
+      "category": "Konsolen",
+      "level": 2,
+      "prompt": "Öffne den Ressourcenmonitor",
+      "hints": [
+        "Ausführen-Dialog öffnen und den Befehl eintippen",
+        "resource monitor abgekürzt"
+      ],
+      "solution": "Win + R, resmon, Enter",
+      "mode": "keysAndResult",
+      "expect": {
+        "sequence": [
+          "Win+R",
+          "text:resmon",
+          "Enter"
+        ]
+      },
+      "verify": {
+        "titleRegex": "Ressourcenmonitor"
+      }
+    },
+    {
+      "id": "konsole-leistung",
+      "category": "Konsolen",
+      "level": 3,
+      "prompt": "Öffne die Leistungsüberwachung",
+      "hints": [
+        "Ausführen-Dialog öffnen und den Befehl eintippen",
+        "performance monitor"
+      ],
+      "solution": "Win + R, perfmon, Enter",
+      "mode": "keysAndResult",
+      "expect": {
+        "sequence": [
+          "Win+R",
+          "text:perfmon",
+          "Enter"
+        ]
+      },
+      "verify": {
+        "process": "mmc.exe",
+        "titleRegex": "Leistungsüberwachung"
+      }
+    },
+    {
+      "id": "konsole-registry",
+      "category": "Konsolen",
+      "level": 2,
+      "prompt": "Öffne den Registrierungs-Editor",
+      "hints": [
+        "Ausführen-Dialog öffnen und den Befehl eintippen",
+        "registry editor"
+      ],
+      "solution": "Win + R, regedit, Enter",
+      "mode": "keysAndResult",
+      "expect": {
+        "sequence": [
+          "Win+R",
+          "text:regedit",
+          "Enter"
+        ]
+      },
+      "verify": {
+        "process": "regedit.exe",
+        "timeoutMs": 20000
+      },
+      "elevated": true
+    },
+    {
+      "id": "konsole-energie",
+      "category": "Konsolen",
+      "level": 2,
+      "prompt": "Öffne die Energieoptionen",
+      "hints": [
+        "Ausführen-Dialog öffnen und den Befehl eintippen",
+        "power config, endet auf .cpl"
+      ],
+      "solution": "Win + R, powercfg.cpl, Enter",
+      "mode": "keysAndResult",
+      "expect": {
+        "sequence": [
+          "Win+R",
+          "text:powercfg.cpl",
+          "Enter"
+        ]
+      },
+      "verify": {
+        "titleRegex": "Energieoptionen|Energie"
+      },
+      "unverified": true
+    },
+    {
+      "id": "konsole-secpol",
+      "category": "Konsolen",
+      "level": 3,
+      "prompt": "Öffne die lokale Sicherheitsrichtlinie",
+      "hints": [
+        "Ausführen-Dialog öffnen und den Befehl eintippen",
+        "security policy"
+      ],
+      "solution": "Win + R, secpol.msc, Enter",
+      "mode": "keysAndResult",
+      "expect": {
+        "sequence": [
+          "Win+R",
+          "text:secpol.msc",
+          "Enter"
+        ]
+      },
+      "verify": {
+        "process": "mmc.exe",
+        "titleRegex": "Sicherheitsrichtlinie",
+        "timeoutMs": 20000
+      },
+      "elevated": true,
+      "requires": {
+        "anyFile": [
+          "%SystemRoot%\\System32\\secpol.msc"
+        ],
+        "note": "Nur in Windows Pro/Enterprise vorhanden"
+      }
+    },
+    {
+      "id": "konsole-freigaben",
+      "category": "Konsolen",
+      "level": 3,
+      "prompt": "Öffne die freigegebenen Ordner",
+      "hints": [
+        "Ausführen-Dialog öffnen und den Befehl eintippen",
+        "file share management"
+      ],
+      "solution": "Win + R, fsmgmt.msc, Enter",
+      "mode": "keysAndResult",
+      "expect": {
+        "sequence": [
+          "Win+R",
+          "text:fsmgmt.msc",
+          "Enter"
+        ]
+      },
+      "verify": {
+        "process": "mmc.exe",
+        "titleRegex": "Freigegebene Ordner"
+      }
+    },
+    {
+      "id": "konsole-netzwerkcenter",
+      "category": "Konsolen",
+      "level": 3,
+      "prompt": "Öffne die Windows-Features (ein/aus)",
+      "hints": [
+        "Ausführen-Dialog öffnen und den Befehl eintippen",
+        "optional features"
+      ],
+      "solution": "Win + R, optionalfeatures, Enter",
+      "mode": "keysAndResult",
+      "expect": {
+        "sequence": [
+          "Win+R",
+          "text:optionalfeatures",
+          "Enter"
+        ]
+      },
+      "verify": {
+        "titleRegex": "Windows-Features"
+      },
+      "elevated": true
+    },
+    {
+      "id": "server-ad-benutzer",
+      "category": "Server",
+      "level": 2,
+      "prompt": "Öffne „Active Directory-Benutzer und -Computer“",
+      "hints": [
+        "Ausführen-Dialog öffnen und den Befehl eintippen",
+        "directory service administration"
+      ],
+      "solution": "Win + R, dsa.msc, Enter",
+      "mode": "keysAndResult",
+      "expect": {
+        "sequence": [
+          "Win+R",
+          "text:dsa.msc",
+          "Enter"
+        ]
+      },
+      "verify": {
+        "process": "mmc.exe",
+        "titleRegex": "Active Directory-Benutzer"
+      },
+      "requires": {
+        "anyFile": [
+          "%SystemRoot%\\System32\\dsa.msc"
+        ],
+        "note": "RSAT (Remoteserver-Verwaltungstools) unter Einstellungen → System → Optionale Features installieren"
+      }
+    },
+    {
+      "id": "server-gpmc",
+      "category": "Server",
+      "level": 2,
+      "prompt": "Öffne die Gruppenrichtlinienverwaltung",
+      "hints": [
+        "Ausführen-Dialog öffnen und den Befehl eintippen",
+        "group policy management console"
+      ],
+      "solution": "Win + R, gpmc.msc, Enter",
+      "mode": "keysAndResult",
+      "expect": {
+        "sequence": [
+          "Win+R",
+          "text:gpmc.msc",
+          "Enter"
+        ]
+      },
+      "verify": {
+        "process": "mmc.exe",
+        "titleRegex": "Gruppenrichtlinienverwaltung"
+      },
+      "requires": {
+        "anyFile": [
+          "%SystemRoot%\\System32\\gpmc.msc"
+        ],
+        "note": "RSAT (Remoteserver-Verwaltungstools) unter Einstellungen → System → Optionale Features installieren"
+      }
+    },
+    {
+      "id": "server-dns",
+      "category": "Server",
+      "level": 2,
+      "prompt": "Öffne den DNS-Manager",
+      "hints": [
+        "Ausführen-Dialog öffnen und den Befehl eintippen",
+        "dns management"
+      ],
+      "solution": "Win + R, dnsmgmt.msc, Enter",
+      "mode": "keysAndResult",
+      "expect": {
+        "sequence": [
+          "Win+R",
+          "text:dnsmgmt.msc",
+          "Enter"
+        ]
+      },
+      "verify": {
+        "process": "mmc.exe",
+        "titleRegex": "DNS"
+      },
+      "requires": {
+        "anyFile": [
+          "%SystemRoot%\\System32\\dnsmgmt.msc"
+        ],
+        "note": "RSAT (Remoteserver-Verwaltungstools) unter Einstellungen → System → Optionale Features installieren"
+      }
+    },
+    {
+      "id": "server-dhcp",
+      "category": "Server",
+      "level": 2,
+      "prompt": "Öffne die DHCP-Verwaltung",
+      "hints": [
+        "Ausführen-Dialog öffnen und den Befehl eintippen",
+        "dhcp management"
+      ],
+      "solution": "Win + R, dhcpmgmt.msc, Enter",
+      "mode": "keysAndResult",
+      "expect": {
+        "sequence": [
+          "Win+R",
+          "text:dhcpmgmt.msc",
+          "Enter"
+        ]
+      },
+      "verify": {
+        "process": "mmc.exe",
+        "titleRegex": "DHCP"
+      },
+      "requires": {
+        "anyFile": [
+          "%SystemRoot%\\System32\\dhcpmgmt.msc"
+        ],
+        "note": "RSAT (Remoteserver-Verwaltungstools) unter Einstellungen → System → Optionale Features installieren"
+      }
+    },
+    {
+      "id": "server-ad-standorte",
+      "category": "Server",
+      "level": 3,
+      "prompt": "Öffne „Active Directory-Standorte und -Dienste“",
+      "hints": [
+        "Ausführen-Dialog öffnen und den Befehl eintippen",
+        "directory service sites"
+      ],
+      "solution": "Win + R, dssite.msc, Enter",
+      "mode": "keysAndResult",
+      "expect": {
+        "sequence": [
+          "Win+R",
+          "text:dssite.msc",
+          "Enter"
+        ]
+      },
+      "verify": {
+        "process": "mmc.exe",
+        "titleRegex": "Standorte"
+      },
+      "requires": {
+        "anyFile": [
+          "%SystemRoot%\\System32\\dssite.msc"
+        ],
+        "note": "RSAT (Remoteserver-Verwaltungstools) unter Einstellungen → System → Optionale Features installieren"
+      }
+    },
+    {
+      "id": "server-manager",
+      "category": "Server",
+      "level": 2,
+      "prompt": "Öffne den Server-Manager",
+      "hints": [
+        "Ausführen-Dialog öffnen und den Befehl eintippen",
+        "ein Wort, englisch"
+      ],
+      "solution": "Win + R, servermanager, Enter",
+      "mode": "keysAndResult",
+      "expect": {
+        "sequence": [
+          "Win+R",
+          "text:servermanager",
+          "Enter"
+        ]
+      },
+      "verify": {
+        "process": "ServerManager.exe",
+        "timeoutMs": 20000
+      },
+      "elevated": true,
+      "requires": {
+        "anyFile": [
+          "%SystemRoot%\\System32\\ServerManager.exe"
+        ],
+        "note": "RSAT: Server-Manager als optionales Feature installieren"
+      }
+    },
+    {
+      "id": "cmd-ipconfig-all",
+      "category": "Kommandozeile",
+      "level": 1,
+      "prompt": "Zeige alle IP-Einstellungen inkl. DNS und MAC an",
+      "hints": [
+        "ipconfig mit einem Schalter für alles"
+      ],
+      "solution": "ipconfig /all",
+      "mode": "keys",
+      "expect": {
+        "sequence": [
+          "text:ipconfig /all",
+          "Enter"
+        ]
+      },
+      "context": "terminal"
+    },
+    {
+      "id": "cmd-ipconfig-flushdns",
+      "category": "Kommandozeile",
+      "level": 2,
+      "prompt": "Leere den DNS-Cache",
+      "hints": [
+        "ipconfig mit einem Schalter zum Leeren (flush)"
+      ],
+      "solution": "ipconfig /flushdns",
+      "mode": "keys",
+      "expect": {
+        "sequence": [
+          "text:ipconfig /flushdns",
+          "Enter"
+        ]
+      },
+      "context": "terminal"
+    },
+    {
+      "id": "cmd-ping",
+      "category": "Kommandozeile",
+      "level": 1,
+      "prompt": "Prüfe mit ping, ob 8.8.8.8 erreichbar ist",
+      "hints": [
+        "ping und das Ziel"
+      ],
+      "solution": "ping 8.8.8.8",
+      "mode": "keys",
+      "expect": {
+        "sequence": [
+          "text:ping 8.8.8.8",
+          "Enter"
+        ]
+      },
+      "context": "terminal"
+    },
+    {
+      "id": "cmd-ping-dauer",
+      "category": "Kommandozeile",
+      "level": 2,
+      "prompt": "Pinge dein Gateway dauerhaft und brich danach ab",
+      "hints": [
+        "ping mit Schalter für Dauerbetrieb, Abbruch mit Strg + C"
+      ],
+      "solution": "ping -t *, Strg+C",
+      "mode": "keys",
+      "expect": {
+        "sequence": [
+          "text:ping -t *",
+          "Enter",
+          "Strg+C"
+        ]
+      },
+      "context": "terminal"
+    },
+    {
+      "id": "cmd-tracert",
+      "category": "Kommandozeile",
+      "level": 1,
+      "prompt": "Verfolge die Route zu einem Server",
+      "hints": [
+        "trace route abgekürzt"
+      ],
+      "solution": "tracert *",
+      "mode": "keys",
+      "expect": {
+        "sequence": [
+          "text:tracert *",
+          "Enter"
+        ]
+      },
+      "context": "terminal"
+    },
+    {
+      "id": "cmd-nslookup",
+      "category": "Kommandozeile",
+      "level": 1,
+      "prompt": "Löse einen Namen per DNS auf",
+      "hints": [
+        "name server lookup"
+      ],
+      "solution": "nslookup *",
+      "mode": "keys",
+      "expect": {
+        "sequence": [
+          "text:nslookup *",
+          "Enter"
+        ]
+      },
+      "context": "terminal"
+    },
+    {
+      "id": "cmd-gpupdate",
+      "category": "Kommandozeile",
+      "level": 2,
+      "prompt": "Erzwinge die Aktualisierung der Gruppenrichtlinien",
+      "hints": [
+        "group policy update mit Schalter zum Erzwingen"
+      ],
+      "solution": "gpupdate /force",
+      "mode": "keys",
+      "expect": {
+        "sequence": [
+          "text:gpupdate /force",
+          "Enter"
+        ]
+      },
+      "context": "terminal"
+    },
+    {
+      "id": "cmd-gpresult",
+      "category": "Kommandozeile",
+      "level": 2,
+      "prompt": "Zeige die angewendeten Gruppenrichtlinien an",
+      "hints": [
+        "group policy result, Schalter für Zusammenfassung"
+      ],
+      "solution": "gpresult /r",
+      "mode": "keys",
+      "expect": {
+        "sequence": [
+          "text:gpresult /r",
+          "Enter"
+        ]
+      },
+      "context": "terminal"
+    },
+    {
+      "id": "cmd-whoami",
+      "category": "Kommandozeile",
+      "level": 1,
+      "prompt": "Zeige an, als wer du angemeldet bist",
+      "hints": [
+        "Englisch: Wer bin ich?"
+      ],
+      "solution": "whoami",
+      "mode": "keys",
+      "expect": {
+        "sequence": [
+          "text:whoami",
+          "Enter"
+        ]
+      },
+      "context": "terminal"
+    },
+    {
+      "id": "cmd-whoami-groups",
+      "category": "Kommandozeile",
+      "level": 2,
+      "prompt": "Zeige deine Gruppenmitgliedschaften an",
+      "hints": [
+        "whoami mit Schalter für Gruppen"
+      ],
+      "solution": "whoami /groups",
+      "mode": "keys",
+      "expect": {
+        "sequence": [
+          "text:whoami /groups",
+          "Enter"
+        ]
+      },
+      "context": "terminal"
+    },
+    {
+      "id": "cmd-netstat",
+      "category": "Kommandozeile",
+      "level": 2,
+      "prompt": "Zeige alle Verbindungen mit Prozess-ID an",
+      "hints": [
+        "netstat mit drei Buchstaben: alle, numerisch, Owner"
+      ],
+      "solution": "netstat -ano",
+      "mode": "keys",
+      "expect": {
+        "sequence": [
+          "text:netstat -ano",
+          "Enter"
+        ]
+      },
+      "context": "terminal"
+    },
+    {
+      "id": "cmd-hostname",
+      "category": "Kommandozeile",
+      "level": 1,
+      "prompt": "Zeige den Computernamen an",
+      "hints": [
+        "Englisch für Rechnername"
+      ],
+      "solution": "hostname",
+      "mode": "keys",
+      "expect": {
+        "sequence": [
+          "text:hostname",
+          "Enter"
+        ]
+      },
+      "context": "terminal"
+    },
+    {
+      "id": "cmd-systeminfo",
+      "category": "Kommandozeile",
+      "level": 1,
+      "prompt": "Zeige Systeminformationen inkl. Startzeit an",
+      "hints": [
+        "system info in einem Wort"
+      ],
+      "solution": "systeminfo",
+      "mode": "keys",
+      "expect": {
+        "sequence": [
+          "text:systeminfo",
+          "Enter"
+        ]
+      },
+      "context": "terminal"
+    },
+    {
+      "id": "ps-get-service",
+      "category": "Kommandozeile",
+      "level": 2,
+      "prompt": "Zeige den Status eines Dienstes in PowerShell",
+      "hints": [
+        "Verb-Substantiv: Get und Service"
+      ],
+      "solution": "Get-Service *",
+      "mode": "keys",
+      "expect": {
+        "sequence": [
+          "text:Get-Service *",
+          "Enter"
+        ]
+      },
+      "context": "powershell"
+    },
+    {
+      "id": "ps-test-netconnection",
+      "category": "Kommandozeile",
+      "level": 3,
+      "prompt": "Prüfe in PowerShell, ob ein Server auf Port 3389 antwortet",
+      "hints": [
+        "Test-NetConnection mit Ziel und -Port",
+        "Kurzform: tnc"
+      ],
+      "solution": "Test-NetConnection * -Port *",
+      "mode": "keys",
+      "expect": {
+        "sequence": [
+          "text:Test-NetConnection * -Port *",
+          "Enter"
+        ],
+        "alternatives": [
+          [
+            "text:tnc * -Port *",
+            "Enter"
+          ]
+        ]
+      },
+      "context": "powershell"
+    },
+    {
+      "id": "ps-get-netipconfig",
+      "category": "Kommandozeile",
+      "level": 2,
+      "prompt": "Zeige die IP-Konfiguration in PowerShell",
+      "hints": [
+        "Get-Net…IPConfiguration",
+        "Kurzform: gip"
+      ],
+      "solution": "Get-NetIPConfiguration",
+      "mode": "keys",
+      "expect": {
+        "sequence": [
+          "text:Get-NetIPConfiguration",
+          "Enter"
+        ],
+        "alternatives": [
+          [
+            "text:gip",
+            "Enter"
+          ]
+        ]
+      },
+      "context": "powershell"
+    },
+    {
+      "id": "ps-restart-service-spooler",
+      "category": "Kommandozeile",
+      "level": 3,
+      "prompt": "Starte in PowerShell (als Admin) die Druckwarteschlange neu",
+      "hints": [
+        "Restart-Service und der Dienstname der Druckwarteschlange"
+      ],
+      "solution": "Restart-Service Spooler",
+      "mode": "keys",
+      "expect": {
+        "sequence": [
+          "text:Restart-Service Spooler",
+          "Enter"
+        ]
+      },
+      "context": "powershell"
+    },
+    {
+      "id": "terminal-neuer-tab",
+      "category": "Terminal",
+      "level": 1,
+      "prompt": "Öffne im Terminal einen neuen Tab",
+      "hints": [
+        "Wie im Browser, aber mit Shift"
+      ],
+      "solution": "Strg + Shift + T",
+      "mode": "keys",
+      "expect": {
+        "sequence": [
+          "Strg+Shift+T"
+        ]
+      },
+      "context": "windowsTerminal"
+    },
+    {
+      "id": "terminal-teilen",
+      "category": "Terminal",
+      "level": 2,
+      "prompt": "Teile das Terminal-Fenster",
+      "hints": [
+        "Alt + Shift und Plus (senkrecht) oder Minus (waagrecht)"
+      ],
+      "solution": "Alt + Shift + Plus",
+      "mode": "keys",
+      "expect": {
+        "sequence": [
+          "Alt+Shift+Plus"
+        ],
+        "alternatives": [
+          [
+            "Alt+Shift+Minus"
+          ]
+        ]
+      },
+      "context": "windowsTerminal"
+    },
+    {
+      "id": "terminal-duplizieren",
+      "category": "Terminal",
+      "level": 2,
+      "prompt": "Dupliziere den aktuellen Tab",
+      "hints": [
+        "D wie duplizieren"
+      ],
+      "solution": "Strg + Shift + D",
+      "mode": "keys",
+      "expect": {
+        "sequence": [
+          "Strg+Shift+D"
+        ]
+      },
+      "context": "windowsTerminal"
+    },
+    {
+      "id": "terminal-profil-2",
+      "category": "Terminal",
+      "level": 2,
+      "prompt": "Öffne einen neuen Tab mit dem zweiten Profil (z. B. Eingabeaufforderung)",
+      "hints": [
+        "Strg + Shift und die Nummer des Profils"
+      ],
+      "solution": "Strg + Shift + 2",
+      "mode": "keys",
+      "expect": {
+        "sequence": [
+          "Strg+Shift+2"
+        ]
+      },
+      "context": "windowsTerminal"
+    },
+    {
+      "id": "terminal-tab-schliessen",
+      "category": "Terminal",
+      "level": 1,
+      "prompt": "Schließe den aktuellen Terminal-Tab",
+      "hints": [
+        "W wie im Browser, aber mit Shift"
+      ],
+      "solution": "Strg + Shift + W",
+      "mode": "keys",
+      "expect": {
+        "sequence": [
+          "Strg+Shift+W"
+        ]
+      },
+      "context": "windowsTerminal"
+    },
+    {
+      "id": "terminal-suchen",
+      "category": "Terminal",
+      "level": 2,
+      "prompt": "Durchsuche die Terminal-Ausgabe",
+      "hints": [
+        "F wie Find, mit Shift"
+      ],
+      "solution": "Strg + Shift + F",
+      "mode": "keys",
+      "expect": {
+        "sequence": [
+          "Strg+Shift+F"
+        ]
+      },
+      "context": "windowsTerminal"
+    },
+    {
+      "id": "terminal-admin-tab",
+      "category": "Terminal",
+      "level": 3,
+      "prompt": "Öffne im Terminal einen Admin-Tab",
+      "hints": [
+        "Erst das Profil-Menü öffnen",
+        "Im Menü startet Strg + Enter das Profil als Administrator"
+      ],
+      "solution": "Strg + Shift + Leertaste, Profil wählen, Strg + Enter",
+      "mode": "keys",
+      "expect": {
+        "sequence": [
+          "Strg+Shift+Leertaste"
+        ]
+      },
+      "context": "windowsTerminal",
+      "elevated": true,
+      "unverified": true
+    },
+    {
+      "id": "terminal-vervollstaendigen",
+      "category": "Terminal",
+      "level": 1,
+      "prompt": "Tippe „cd C:\\Win“ und vervollständige mit der Tastatur",
+      "hints": [
+        "Nicht ausschreiben – eine Taste vervollständigt"
+      ],
+      "solution": "cd C:\\Win, Tab",
+      "mode": "keys",
+      "expect": {
+        "sequence": [
+          "text:cd C:\\Win",
+          "Tab"
+        ]
+      },
+      "context": "terminal"
+    },
+    {
+      "id": "terminal-verlauf",
+      "category": "Terminal",
+      "level": 1,
+      "prompt": "Hole den letzten Befehl zurück",
+      "hints": [
+        "Eine Pfeiltaste"
+      ],
+      "solution": "Pfeil hoch",
+      "mode": "keys",
+      "expect": {
+        "sequence": [
+          "Pfeil hoch"
+        ]
+      },
+      "context": "terminal"
+    },
+    {
+      "id": "terminal-verlauf-f7",
+      "category": "Terminal",
+      "level": 2,
+      "prompt": "Zeige in der Eingabeaufforderung den Befehlsverlauf als Liste",
+      "hints": [
+        "Eine Funktionstaste (nur in cmd)"
+      ],
+      "solution": "F7",
+      "mode": "keys",
+      "expect": {
+        "sequence": [
+          "F7"
+        ]
+      },
+      "context": "cmd"
+    },
+    {
+      "id": "terminal-rueckwaertssuche",
+      "category": "Terminal",
+      "level": 2,
+      "prompt": "Suche in PowerShell rückwärts im Befehlsverlauf",
+      "hints": [
+        "R wie reverse"
+      ],
+      "solution": "Strg + R",
+      "mode": "keys",
+      "expect": {
+        "sequence": [
+          "Strg+R"
+        ]
+      },
+      "context": "powershell"
+    },
+    {
+      "id": "terminal-abbrechen",
+      "category": "Terminal",
+      "level": 1,
+      "prompt": "Brich den laufenden Befehl ab",
+      "hints": [
+        "Dasselbe Kürzel wie Kopieren"
+      ],
+      "solution": "Strg + C",
+      "mode": "keys",
+      "expect": {
+        "sequence": [
+          "Strg+C"
+        ]
+      },
+      "context": "terminal"
+    },
+    {
+      "id": "terminal-leeren",
+      "category": "Terminal",
+      "level": 1,
+      "prompt": "Leere die Terminal-Anzeige",
+      "hints": [
+        "clear screen abgekürzt"
+      ],
+      "solution": "cls, Enter",
+      "mode": "keys",
+      "expect": {
+        "sequence": [
+          "text:cls",
+          "Enter"
+        ],
+        "alternatives": [
+          [
+            "text:clear",
+            "Enter"
+          ],
+          [
+            "Strg+L"
+          ]
+        ]
+      },
+      "context": "terminal"
+    },
+    {
+      "id": "rdp-verbinden",
+      "category": "Fernwartung",
+      "level": 2,
+      "prompt": "Verbinde dich per Remotedesktop direkt mit einem Server",
+      "hints": [
+        "Ausführen-Dialog öffnen und den Befehl eintippen",
+        "mstsc mit Schalter /v: und dem Servernamen"
+      ],
+      "solution": "Win + R, mstsc /v:server, Enter",
+      "mode": "keysAndResult",
+      "expect": {
+        "sequence": [
+          "Win+R",
+          "text:mstsc /v:*",
+          "Enter"
+        ]
+      },
+      "verify": {
+        "process": "mstsc.exe"
+      }
+    },
+    {
+      "id": "rdp-strg-alt-entf",
+      "category": "Fernwartung",
+      "level": 2,
+      "prompt": "Sende Strg + Alt + Entf an die RDP-Sitzung",
+      "hints": [
+        "Entf geht an deinen eigenen PC – in RDP ersetzt eine andere Taste das Entf"
+      ],
+      "solution": "Strg + Alt + Ende",
+      "mode": "keys",
+      "expect": {
+        "sequence": [
+          "Strg+Alt+Ende"
+        ]
+      },
+      "context": "rdp",
+      "unverified": true
+    },
+    {
+      "id": "rdp-vollbild",
+      "category": "Fernwartung",
+      "level": 3,
+      "prompt": "Schalte die RDP-Sitzung in den Vollbildmodus und zurück",
+      "hints": [
+        "Strg + Alt und die Pause-Taste (Laptop: oft mit Fn)"
+      ],
+      "solution": "Strg + Alt + Pause",
+      "mode": "keys",
+      "expect": {
+        "sequence": [
+          "Strg+Alt+Pause"
+        ]
+      },
+      "context": "rdp",
+      "unverified": true
+    },
+    {
+      "id": "rdp-alt-tab",
+      "category": "Fernwartung",
+      "level": 3,
+      "prompt": "Wechsle in der RDP-Sitzung das Fenster (im Fenstermodus)",
+      "hints": [
+        "Alt + Tab geht an deinen PC – in RDP ersetzt Bild auf das Tab"
+      ],
+      "solution": "Alt + Bild auf",
+      "mode": "keys",
+      "expect": {
+        "sequence": [
+          "Alt+Bild auf"
+        ]
+      },
+      "context": "rdp",
+      "unverified": true
+    },
+    {
+      "id": "vm-strg-alt-entf",
+      "category": "Fernwartung",
+      "level": 2,
+      "prompt": "Sende Strg + Alt + Entf an die VM-Konsole (VMware)",
+      "hints": [
+        "VMware: Einfg statt Entf, Hyper-V: Ende statt Entf"
+      ],
+      "solution": "Strg + Alt + Einfg",
+      "mode": "keys",
+      "expect": {
+        "sequence": [
+          "Strg+Alt+Einfg"
+        ],
+        "alternatives": [
+          [
+            "Strg+Alt+Ende"
+          ]
+        ]
+      },
+      "context": "vmconsole",
+      "unverified": true
+    },
+    {
+      "id": "ssh-verbinden",
+      "category": "Linux",
+      "level": 1,
+      "prompt": "Verbinde dich per SSH als Benutzer admin mit einem Server",
+      "hints": [
+        "ssh benutzer@host"
+      ],
+      "solution": "ssh admin@server, Enter",
+      "mode": "keys",
+      "expect": {
+        "sequence": [
+          "text:ssh *@*",
+          "Enter"
+        ]
+      },
+      "context": "terminal"
+    },
+    {
+      "id": "bash-suche",
+      "category": "Linux",
+      "level": 1,
+      "prompt": "Suche rückwärts im Befehlsverlauf (in der SSH-/Bash-Sitzung)",
+      "hints": [
+        "R wie reverse"
+      ],
+      "solution": "Strg + R",
+      "mode": "keys",
+      "expect": {
+        "sequence": [
+          "Strg+R"
+        ]
+      },
+      "context": "terminal"
+    },
+    {
+      "id": "bash-zeilenanfang",
+      "category": "Linux",
+      "level": 1,
+      "prompt": "Springe an den Zeilenanfang (in der SSH-/Bash-Sitzung)",
+      "hints": [
+        "A wie der Anfang des Alphabets"
+      ],
+      "solution": "Strg + A",
+      "mode": "keys",
+      "expect": {
+        "sequence": [
+          "Strg+A"
+        ]
+      },
+      "context": "terminal"
+    },
+    {
+      "id": "bash-zeilenende",
+      "category": "Linux",
+      "level": 1,
+      "prompt": "Springe an das Zeilenende (in der SSH-/Bash-Sitzung)",
+      "hints": [
+        "E wie end"
+      ],
+      "solution": "Strg + E",
+      "mode": "keys",
+      "expect": {
+        "sequence": [
+          "Strg+E"
+        ]
+      },
+      "context": "terminal"
+    },
+    {
+      "id": "bash-clear",
+      "category": "Linux",
+      "level": 1,
+      "prompt": "Leere den Bildschirm (in der SSH-/Bash-Sitzung)",
+      "hints": [
+        "L wie leeren"
+      ],
+      "solution": "Strg + L",
+      "mode": "keys",
+      "expect": {
+        "sequence": [
+          "Strg+L"
+        ]
+      },
+      "context": "terminal"
+    },
+    {
+      "id": "bash-zeile-loeschen",
+      "category": "Linux",
+      "level": 2,
+      "prompt": "Lösche alles links vom Cursor (in der SSH-/Bash-Sitzung)",
+      "hints": [
+        "U"
+      ],
+      "solution": "Strg + U",
+      "mode": "keys",
+      "expect": {
+        "sequence": [
+          "Strg+U"
+        ]
+      },
+      "context": "terminal"
+    },
+    {
+      "id": "bash-wort-loeschen",
+      "category": "Linux",
+      "level": 2,
+      "prompt": "Lösche das Wort links vom Cursor (in der SSH-/Bash-Sitzung)",
+      "hints": [
+        "W wie Wort"
+      ],
+      "solution": "Strg + W",
+      "mode": "keys",
+      "expect": {
+        "sequence": [
+          "Strg+W"
+        ]
+      },
+      "context": "terminal"
+    },
+    {
+      "id": "bash-abmelden",
+      "category": "Linux",
+      "level": 2,
+      "prompt": "Melde dich aus der Sitzung ab (in der SSH-/Bash-Sitzung)",
+      "hints": [
+        "D wie done – beendet die Shell"
+      ],
+      "solution": "Strg + D",
+      "mode": "keys",
+      "expect": {
+        "sequence": [
+          "Strg+D"
+        ]
+      },
+      "context": "terminal"
+    },
+    {
+      "id": "bash-sudo-letzter",
+      "category": "Linux",
+      "level": 2,
+      "prompt": "Wiederhole den letzten Befehl mit sudo",
+      "hints": [
+        "sudo und zwei Satzzeichen"
+      ],
+      "solution": "sudo !!, Enter",
+      "mode": "keys",
+      "expect": {
+        "sequence": [
+          "text:sudo !!",
+          "Enter"
+        ]
+      },
+      "context": "terminal"
+    },
+    {
+      "id": "outlook-neue-mail",
+      "category": "Büro",
+      "level": 1,
+      "prompt": "Schreibe in Outlook eine neue E-Mail",
+      "hints": [
+        "M wie Mail – mit Shift geht es überall"
+      ],
+      "solution": "Strg + Shift + M (in der Mailansicht auch Strg + N)",
+      "mode": "keys",
+      "expect": {
+        "sequence": [
+          "Strg+Shift+M"
+        ],
+        "alternatives": [
+          [
+            "Strg+N"
+          ]
+        ]
+      },
+      "context": "outlook",
+      "requires": {
+        "anyFile": [
+          "%ProgramFiles%\\Microsoft Office\\root\\Office16\\OUTLOOK.EXE",
+          "%LocalAppData%\\Microsoft\\WindowsApps\\olk.exe"
+        ],
+        "note": "Outlook installieren"
+      }
+    },
+    {
+      "id": "outlook-mail",
+      "category": "Büro",
+      "level": 1,
+      "prompt": "Wechsle in Outlook zur Mailansicht",
+      "hints": [
+        "Strg und die Nummer der Ansicht"
+      ],
+      "solution": "Strg + 1",
+      "mode": "keys",
+      "expect": {
+        "sequence": [
+          "Strg+1"
+        ]
+      },
+      "context": "outlook",
+      "requires": {
+        "anyFile": [
+          "%ProgramFiles%\\Microsoft Office\\root\\Office16\\OUTLOOK.EXE",
+          "%LocalAppData%\\Microsoft\\WindowsApps\\olk.exe"
+        ],
+        "note": "Outlook installieren"
+      }
+    },
+    {
+      "id": "outlook-kalender",
+      "category": "Büro",
+      "level": 1,
+      "prompt": "Wechsle in Outlook zum Kalender",
+      "hints": [
+        "Strg und die Nummer der Ansicht"
+      ],
+      "solution": "Strg + 2",
+      "mode": "keys",
+      "expect": {
+        "sequence": [
+          "Strg+2"
+        ]
+      },
+      "context": "outlook",
+      "requires": {
+        "anyFile": [
+          "%ProgramFiles%\\Microsoft Office\\root\\Office16\\OUTLOOK.EXE",
+          "%LocalAppData%\\Microsoft\\WindowsApps\\olk.exe"
+        ],
+        "note": "Outlook installieren"
+      }
+    },
+    {
+      "id": "outlook-antworten",
+      "category": "Büro",
+      "level": 1,
+      "prompt": "Antworte auf die markierte Mail",
+      "hints": [
+        "R wie reply"
+      ],
+      "solution": "Strg + R",
+      "mode": "keys",
+      "expect": {
+        "sequence": [
+          "Strg+R"
+        ]
+      },
+      "context": "outlook",
+      "requires": {
+        "anyFile": [
+          "%ProgramFiles%\\Microsoft Office\\root\\Office16\\OUTLOOK.EXE",
+          "%LocalAppData%\\Microsoft\\WindowsApps\\olk.exe"
+        ],
+        "note": "Outlook installieren"
+      }
+    },
+    {
+      "id": "outlook-allen-antworten",
+      "category": "Büro",
+      "level": 2,
+      "prompt": "Antworte allen",
+      "hints": [
+        "Wie Antworten, mit Shift"
+      ],
+      "solution": "Strg + Shift + R",
+      "mode": "keys",
+      "expect": {
+        "sequence": [
+          "Strg+Shift+R"
+        ]
+      },
+      "context": "outlook",
+      "requires": {
+        "anyFile": [
+          "%ProgramFiles%\\Microsoft Office\\root\\Office16\\OUTLOOK.EXE",
+          "%LocalAppData%\\Microsoft\\WindowsApps\\olk.exe"
+        ],
+        "note": "Outlook installieren"
+      }
+    },
+    {
+      "id": "outlook-weiterleiten",
+      "category": "Büro",
+      "level": 1,
+      "prompt": "Leite die markierte Mail weiter",
+      "hints": [
+        "F wie forward"
+      ],
+      "solution": "Strg + F",
+      "mode": "keys",
+      "expect": {
+        "sequence": [
+          "Strg+F"
+        ]
+      },
+      "context": "outlook",
+      "unverified": true,
+      "requires": {
+        "anyFile": [
+          "%ProgramFiles%\\Microsoft Office\\root\\Office16\\OUTLOOK.EXE",
+          "%LocalAppData%\\Microsoft\\WindowsApps\\olk.exe"
+        ],
+        "note": "Outlook installieren"
+      }
+    },
+    {
+      "id": "outlook-senden",
+      "category": "Büro",
+      "level": 1,
+      "prompt": "Sende die Mail ab",
+      "hints": [
+        "Strg und Enter"
+      ],
+      "solution": "Strg + Enter",
+      "mode": "keys",
+      "expect": {
+        "sequence": [
+          "Strg+Enter"
+        ],
+        "alternatives": [
+          [
+            "Alt+S"
+          ]
+        ]
+      },
+      "context": "outlook",
+      "requires": {
+        "anyFile": [
+          "%ProgramFiles%\\Microsoft Office\\root\\Office16\\OUTLOOK.EXE",
+          "%LocalAppData%\\Microsoft\\WindowsApps\\olk.exe"
+        ],
+        "note": "Outlook installieren"
+      }
+    },
+    {
+      "id": "outlook-suche",
+      "category": "Büro",
+      "level": 1,
+      "prompt": "Springe in Outlook in die Suche",
+      "hints": [
+        "E"
+      ],
+      "solution": "Strg + E",
+      "mode": "keys",
+      "expect": {
+        "sequence": [
+          "Strg+E"
+        ]
+      },
+      "context": "outlook",
+      "requires": {
+        "anyFile": [
+          "%ProgramFiles%\\Microsoft Office\\root\\Office16\\OUTLOOK.EXE",
+          "%LocalAppData%\\Microsoft\\WindowsApps\\olk.exe"
+        ],
+        "note": "Outlook installieren"
+      }
+    },
+    {
+      "id": "teams-stumm",
+      "category": "Büro",
+      "level": 1,
+      "prompt": "Schalte dich in Teams stumm bzw. wieder an",
+      "hints": [
+        "M wie Mikrofon"
+      ],
+      "solution": "Strg + Shift + M",
+      "mode": "keys",
+      "expect": {
+        "sequence": [
+          "Strg+Shift+M"
+        ]
+      },
+      "context": "teams",
+      "requires": {
+        "anyFile": [
+          "%LocalAppData%\\Microsoft\\WindowsApps\\ms-teams.exe"
+        ],
+        "note": "Microsoft Teams (neu) installieren"
+      }
+    },
+    {
+      "id": "teams-kamera",
+      "category": "Büro",
+      "level": 1,
+      "prompt": "Schalte in Teams die Kamera ein/aus",
+      "hints": [
+        "O wie das Kamera-Objektiv"
+      ],
+      "solution": "Strg + Shift + O",
+      "mode": "keys",
+      "expect": {
+        "sequence": [
+          "Strg+Shift+O"
+        ]
+      },
+      "context": "teams",
+      "requires": {
+        "anyFile": [
+          "%LocalAppData%\\Microsoft\\WindowsApps\\ms-teams.exe"
+        ],
+        "note": "Microsoft Teams (neu) installieren"
+      }
+    },
+    {
+      "id": "teams-auflegen",
+      "category": "Büro",
+      "level": 2,
+      "prompt": "Lege in Teams auf",
+      "hints": [
+        "H wie hang up"
+      ],
+      "solution": "Strg + Shift + H",
+      "mode": "keys",
+      "expect": {
+        "sequence": [
+          "Strg+Shift+H"
+        ]
+      },
+      "context": "teams",
+      "requires": {
+        "anyFile": [
+          "%LocalAppData%\\Microsoft\\WindowsApps\\ms-teams.exe"
+        ],
+        "note": "Microsoft Teams (neu) installieren"
+      }
+    },
+    {
+      "id": "teams-suche",
+      "category": "Büro",
+      "level": 1,
+      "prompt": "Springe in Teams in die Suche",
+      "hints": [
+        "E"
+      ],
+      "solution": "Strg + E",
+      "mode": "keys",
+      "expect": {
+        "sequence": [
+          "Strg+E"
+        ]
+      },
+      "context": "teams",
+      "unverified": true,
+      "requires": {
+        "anyFile": [
+          "%LocalAppData%\\Microsoft\\WindowsApps\\ms-teams.exe"
+        ],
+        "note": "Microsoft Teams (neu) installieren"
+      }
+    },
+    {
+      "id": "teams-neuer-chat",
+      "category": "Büro",
+      "level": 1,
+      "prompt": "Starte in Teams einen neuen Chat",
+      "hints": [
+        "N wie neu"
+      ],
+      "solution": "Strg + N",
+      "mode": "keys",
+      "expect": {
+        "sequence": [
+          "Strg+N"
+        ]
+      },
+      "context": "teams",
+      "unverified": true,
+      "requires": {
+        "anyFile": [
+          "%LocalAppData%\\Microsoft\\WindowsApps\\ms-teams.exe"
+        ],
+        "note": "Microsoft Teams (neu) installieren"
+      }
+    },
+    {
+      "id": "browser-adressleiste",
+      "category": "Browser",
+      "level": 1,
+      "prompt": "Springe in die Adressleiste",
+      "hints": [
+        "L wie Location"
+      ],
+      "solution": "Strg + L (oder Alt + D, F6)",
+      "mode": "keys",
+      "expect": {
+        "sequence": [
+          "Strg+L"
+        ],
+        "alternatives": [
+          [
+            "Alt+D"
+          ],
+          [
+            "F6"
+          ]
+        ]
+      },
+      "context": "browser"
+    },
+    {
+      "id": "browser-neuer-tab",
+      "category": "Browser",
+      "level": 1,
+      "prompt": "Öffne einen neuen Tab",
+      "hints": [
+        "T wie Tab"
+      ],
+      "solution": "Strg + T",
+      "mode": "keys",
+      "expect": {
+        "sequence": [
+          "Strg+T"
+        ]
+      },
+      "context": "browser"
+    },
+    {
+      "id": "browser-tab-zurueck",
+      "category": "Browser",
+      "level": 1,
+      "prompt": "Hole den zuletzt geschlossenen Tab zurück",
+      "hints": [
+        "Wie neuer Tab, mit Shift"
+      ],
+      "solution": "Strg + Shift + T",
+      "mode": "keys",
+      "expect": {
+        "sequence": [
+          "Strg+Shift+T"
+        ]
+      },
+      "context": "browser"
+    },
+    {
+      "id": "browser-tab-schliessen",
+      "category": "Browser",
+      "level": 1,
+      "prompt": "Schließe den aktuellen Tab",
+      "hints": [
+        "W wie weg"
+      ],
+      "solution": "Strg + W",
+      "mode": "keys",
+      "expect": {
+        "sequence": [
+          "Strg+W"
+        ]
+      },
+      "context": "browser"
+    },
+    {
+      "id": "browser-tab-3",
+      "category": "Browser",
+      "level": 1,
+      "prompt": "Springe zu Tab 3",
+      "hints": [
+        "Strg und die Nummer"
+      ],
+      "solution": "Strg + 3",
+      "mode": "keys",
+      "expect": {
+        "sequence": [
+          "Strg+3"
+        ]
+      },
+      "context": "browser"
+    },
+    {
+      "id": "browser-tab-wechsel",
+      "category": "Browser",
+      "level": 1,
+      "prompt": "Wechsle zum nächsten Tab",
+      "hints": [
+        "Wie Alt + Tab, nur mit Strg"
+      ],
+      "solution": "Strg + Tab",
+      "mode": "keys",
+      "expect": {
+        "sequence": [
+          "Strg+Tab"
+        ],
+        "alternatives": [
+          [
+            "Strg+Bild ab"
+          ]
+        ]
+      },
+      "context": "browser"
+    },
+    {
+      "id": "browser-zurueck",
+      "category": "Browser",
+      "level": 1,
+      "prompt": "Gehe eine Seite zurück",
+      "hints": [
+        "Alt plus Pfeil"
+      ],
+      "solution": "Alt + Pfeil links",
+      "mode": "keys",
+      "expect": {
+        "sequence": [
+          "Alt+Pfeil links"
+        ]
+      },
+      "context": "browser"
+    },
+    {
+      "id": "browser-neu-laden",
+      "category": "Browser",
+      "level": 2,
+      "prompt": "Lade die Seite ohne Cache neu",
+      "hints": [
+        "F5 lädt neu – mit Strg ohne Cache"
+      ],
+      "solution": "Strg + F5",
+      "mode": "keys",
+      "expect": {
+        "sequence": [
+          "Strg+F5"
+        ],
+        "alternatives": [
+          [
+            "Strg+Shift+R"
+          ]
+        ]
+      },
+      "context": "browser"
+    },
+    {
+      "id": "browser-profil",
+      "category": "Browser",
+      "level": 2,
+      "prompt": "Wechsle das Browser-Profil",
+      "hints": [
+        "M wie Mensch/Profil, mit Strg + Shift"
+      ],
+      "solution": "Strg + Shift + M",
+      "mode": "keys",
+      "expect": {
+        "sequence": [
+          "Strg+Shift+M"
+        ]
+      },
+      "context": "browser"
+    },
+    {
+      "id": "browser-privat",
+      "category": "Browser",
+      "level": 1,
+      "prompt": "Öffne ein privates Fenster",
+      "hints": [
+        "N wie neu, mit Shift – Firefox: P"
+      ],
+      "solution": "Strg + Shift + N (Edge/Chrome)",
+      "mode": "keys",
+      "expect": {
+        "sequence": [
+          "Strg+Shift+N"
+        ],
+        "alternatives": [
+          [
+            "Strg+Shift+P"
+          ]
+        ]
+      },
+      "context": "browser"
+    },
+    {
+      "id": "browser-entwickler",
+      "category": "Browser",
+      "level": 2,
+      "prompt": "Öffne die Entwicklertools",
+      "hints": [
+        "Eine Funktionstaste"
+      ],
+      "solution": "F12",
+      "mode": "keys",
+      "expect": {
+        "sequence": [
+          "F12"
+        ],
+        "alternatives": [
+          [
+            "Strg+Shift+I"
+          ]
+        ]
+      },
+      "context": "browser"
+    },
+    {
+      "id": "browser-suche-link",
+      "category": "Browser",
+      "level": 2,
+      "prompt": "Öffne auf der Übungsseite den Link „Ticket 4711“ über die Suche",
+      "hints": [
+        "Suchen, Text tippen, Suche schließen – der Treffer bleibt markiert"
+      ],
+      "solution": "Strg + F, Text, Esc, Enter",
+      "mode": "keysAndResult",
+      "expect": {
+        "sequence": [
+          "Strg+F",
+          "text:*",
+          "Esc",
+          "Enter"
+        ]
+      },
+      "verify": {
+        "practiceTitle": "suche-link"
+      },
+      "context": "practice"
+    },
+    {
+      "id": "browser-vimium-speichern",
+      "category": "Browser",
+      "level": 3,
+      "prompt": "Klicke auf der Übungsseite mit Vimium auf „Ticket speichern“",
+      "hints": [
+        "Vimium: f zeigt Buchstaben an allen Links und Buttons"
+      ],
+      "solution": "f, Buchstaben des Buttons",
+      "mode": "result",
+      "verify": {
+        "practiceTitle": "vimium-speichern"
+      },
+      "context": "practice"
+    },
+    {
+      "id": "browser-vimium-suchfeld",
+      "category": "Browser",
+      "level": 3,
+      "prompt": "Springe auf der Übungsseite mit Vimium ins Suchfeld",
+      "hints": [
+        "Vimium: g und i für input"
+      ],
+      "solution": "gi",
+      "mode": "keysAndResult",
+      "expect": {
+        "sequence": [
+          "text:gi"
+        ]
+      },
+      "verify": {
+        "practiceTitle": "vimium-suchfeld"
+      },
+      "context": "practice"
+    },
+    {
+      "id": "browser-formular-tab",
+      "category": "Browser",
+      "level": 2,
+      "prompt": "Fülle das Formular auf der Übungsseite nur mit der Tastatur aus und sende es ab",
+      "hints": [
+        "Tab springt zum nächsten Feld, Leertaste setzt Haken, Enter sendet"
+      ],
+      "solution": "Tab, Leertaste, Enter",
+      "mode": "result",
+      "verify": {
+        "practiceTitle": "formular-tab"
+      },
+      "context": "practice"
+    },
+    {
+      "id": "sz-dienst-pruefen",
+      "category": "Szenario",
+      "level": 2,
+      "prompt": "Dienst prüfen: Öffne die Eigenschaften der Druckwarteschlange",
+      "hints": [
+        "Dienste-Verwaltung, dann tippen, dann Eigenschaften"
+      ],
+      "solution": "services.msc → „Druck“ tippen → Alt + Enter",
+      "mode": "scenario",
+      "steps": [
+        {
+          "prompt": "Öffne die Dienste-Verwaltung",
+          "hints": [
+            "Ausführen-Dialog öffnen und den Befehl eintippen"
+          ],
+          "solution": "Win + R, services.msc, Enter",
+          "mode": "keysAndResult",
+          "expect": {
+            "sequence": [
+              "Win+R",
+              "text:services.msc",
+              "Enter"
+            ]
+          },
+          "verify": {
+            "process": "mmc.exe",
+            "titleRegex": "Dienste"
+          }
+        },
+        {
+          "prompt": "Springe zur Druckwarteschlange",
+          "hints": [
+            "In der Liste springt Tippen zum passenden Eintrag"
+          ],
+          "solution": "In die Liste wechseln (Tab), „Druck“ tippen",
+          "mode": "result",
+          "verify": {
+            "process": "mmc.exe",
+            "titleRegex": "Dienste",
+            "uiaSelected": "Druckwarteschlange"
+          }
+        },
+        {
+          "prompt": "Öffne ihre Eigenschaften",
+          "hints": [
+            "Wie im Explorer"
+          ],
+          "solution": "Alt + Enter",
+          "mode": "keysAndResult",
+          "expect": {
+            "sequence": [
+              "Alt+Enter"
+            ]
+          },
+          "verify": {
+            "titleRegex": "Druckwarteschlange"
+          }
+        }
+      ]
+    },
+    {
+      "id": "sz-log-finden",
+      "category": "Szenario",
+      "level": 2,
+      "prompt": "Log finden: Öffne das System-Protokoll in der Ereignisanzeige",
+      "hints": [
+        "Ereignisanzeige, dann im Baum navigieren"
+      ],
+      "solution": "eventvwr.msc → Windows-Protokolle → System",
+      "mode": "scenario",
+      "steps": [
+        {
+          "prompt": "Öffne die Ereignisanzeige",
+          "hints": [
+            "Ausführen-Dialog öffnen und den Befehl eintippen"
+          ],
+          "solution": "Win + R, eventvwr.msc, Enter",
+          "mode": "keysAndResult",
+          "expect": {
+            "sequence": [
+              "Win+R",
+              "text:eventvwr.msc",
+              "Enter"
+            ]
+          },
+          "verify": {
+            "process": "mmc.exe",
+            "titleRegex": "Ereignisanzeige"
+          }
+        },
+        {
+          "prompt": "Wähle Windows-Protokolle → System",
+          "hints": [
+            "Pfeil runter/hoch wählt, Pfeil rechts klappt auf"
+          ],
+          "solution": "Pfeiltasten im Baum, Pfeil rechts klappt auf",
+          "mode": "result",
+          "verify": {
+            "process": "mmc.exe",
+            "titleRegex": "Ereignisanzeige",
+            "uiaSelected": "System"
+          }
+        }
+      ]
+    },
+    {
+      "id": "sz-adapter-pruefen",
+      "category": "Szenario",
+      "level": 2,
+      "prompt": "Adapter prüfen: Öffne die Eigenschaften der Netzwerkkarte",
+      "hints": [
+        "Netzwerkverbindungen, dann Eigenschaften"
+      ],
+      "solution": "ncpa.cpl → Adapter wählen → Alt + Enter",
+      "mode": "scenario",
+      "steps": [
+        {
+          "prompt": "Öffne die Netzwerkverbindungen",
+          "hints": [
+            "Ausführen-Dialog öffnen und den Befehl eintippen"
+          ],
+          "solution": "Win + R, ncpa.cpl, Enter",
+          "mode": "keysAndResult",
+          "expect": {
+            "sequence": [
+              "Win+R",
+              "text:ncpa.cpl",
+              "Enter"
+            ]
+          },
+          "verify": {
+            "titleRegex": "Netzwerkverbindungen"
+          }
+        },
+        {
+          "prompt": "Öffne die Eigenschaften des Adapters",
+          "hints": [
+            "Adapter mit den Pfeiltasten wählen, dann wie im Explorer"
+          ],
+          "solution": "Pfeiltasten, Alt + Enter",
+          "mode": "keysAndResult",
+          "expect": {
+            "sequence": [
+              "Alt+Enter"
+            ]
+          },
+          "verify": {
+            "titleRegex": "Eigenschaften von"
+          }
+        }
+      ]
+    },
+    {
+      "id": "sz-web-ticket",
+      "category": "Szenario",
+      "level": 3,
+      "prompt": "Web-Ticket: Öffne auf der Übungsseite ein Ticket, schreibe einen Kommentar und speichere",
+      "hints": [
+        "Alles ohne Maus – Vimium oder Tab"
+      ],
+      "solution": "Vimium/Tab-Navigation",
+      "mode": "scenario",
+      "steps": [
+        {
+          "prompt": "Öffne die Ticketliste",
+          "hints": [
+            "Vimium: f"
+          ],
+          "solution": "Vimium f oder Tab + Enter",
+          "mode": "result",
+          "verify": {
+            "practiceTitle": "ticketliste"
+          },
+          "context": "practice"
+        },
+        {
+          "prompt": "Öffne Ticket 4711",
+          "hints": [
+            "Suchen oder Vimium"
+          ],
+          "solution": "Vimium f oder Strg + F",
+          "mode": "result",
+          "verify": {
+            "practiceTitle": "ticket-4711"
+          },
+          "context": "practice"
+        },
+        {
+          "prompt": "Schreibe einen Kommentar ins Formular",
+          "hints": [
+            "Vimium: gi springt ins erste Eingabefeld"
+          ],
+          "solution": "Tab ins Kommentarfeld, tippen",
+          "mode": "result",
+          "verify": {
+            "practiceTitle": "kommentar"
+          },
+          "context": "practice"
+        },
+        {
+          "prompt": "Speichere das Ticket",
+          "hints": [
+            "Oder Vimium: f"
+          ],
+          "solution": "Tab zum Button, Enter",
+          "mode": "result",
+          "verify": {
+            "practiceTitle": "ticket-gespeichert"
+          },
+          "context": "practice"
+        }
+      ]
+    },
+    {
+      "id": "sz-keine-ip",
+      "category": "Szenario",
+      "level": 2,
+      "prompt": "PC hat keine IP: Adapter prüfen und IP-Adresse neu holen",
+      "hints": [
+        "Erst schauen, dann per ipconfig erneuern"
+      ],
+      "solution": "ncpa.cpl → Terminal → ipconfig /release, /renew, /all",
+      "mode": "scenario",
+      "steps": [
+        {
+          "prompt": "Prüfe die Netzwerkverbindungen",
+          "hints": [
+            "Ausführen-Dialog öffnen und den Befehl eintippen"
+          ],
+          "solution": "Win + R, ncpa.cpl, Enter",
+          "mode": "keysAndResult",
+          "expect": {
+            "sequence": [
+              "Win+R",
+              "text:ncpa.cpl",
+              "Enter"
+            ]
+          },
+          "verify": {
+            "titleRegex": "Netzwerkverbindungen"
+          }
+        },
+        {
+          "prompt": "Öffne das Terminal",
+          "hints": [
+            "Schnelllink-Menü"
+          ],
+          "solution": "Win + X, I",
+          "mode": "keysAndResult",
+          "expect": {
+            "sequence": [
+              "Win+X",
+              "text:i"
+            ]
+          },
+          "verify": {
+            "process": "WindowsTerminal.exe"
+          }
+        },
+        {
+          "prompt": "Gib die IP-Adresse frei",
+          "hints": [
+            "ipconfig mit Schalter zum Freigeben"
+          ],
+          "solution": "ipconfig /release, Enter",
+          "mode": "keys",
+          "expect": {
+            "sequence": [
+              "text:ipconfig /release",
+              "Enter"
+            ]
+          },
+          "context": "terminal"
+        },
+        {
+          "prompt": "Hole eine neue IP-Adresse",
+          "hints": [
+            "ipconfig mit Schalter zum Erneuern"
+          ],
+          "solution": "ipconfig /renew, Enter",
+          "mode": "keys",
+          "expect": {
+            "sequence": [
+              "text:ipconfig /renew",
+              "Enter"
+            ]
+          },
+          "context": "terminal"
+        },
+        {
+          "prompt": "Prüfe das Ergebnis",
+          "hints": [
+            "ipconfig mit Schalter für alles"
+          ],
+          "solution": "ipconfig /all, Enter",
+          "mode": "keys",
+          "expect": {
+            "sequence": [
+              "text:ipconfig /all",
+              "Enter"
+            ]
+          },
+          "context": "terminal"
+        }
+      ]
+    },
+    {
+      "id": "sz-drucker-haengt",
+      "category": "Szenario",
+      "level": 3,
+      "prompt": "Drucker hängt: Druckwarteschlange prüfen und neu starten",
+      "hints": [
+        "Erst im Dienste-Fenster nachsehen, dann mit Admin-Rechten neu starten"
+      ],
+      "solution": "services.msc → Druckwarteschlange → Admin-Terminal → Restart-Service Spooler",
+      "mode": "scenario",
+      "steps": [
+        {
+          "prompt": "Öffne die Dienste-Verwaltung",
+          "hints": [
+            "Ausführen-Dialog öffnen und den Befehl eintippen"
+          ],
+          "solution": "Win + R, services.msc, Enter",
+          "mode": "keysAndResult",
+          "expect": {
+            "sequence": [
+              "Win+R",
+              "text:services.msc",
+              "Enter"
+            ]
+          },
+          "verify": {
+            "process": "mmc.exe",
+            "titleRegex": "Dienste"
+          }
+        },
+        {
+          "prompt": "Öffne die Eigenschaften der Druckwarteschlange",
+          "hints": [
+            "In der Liste tippen, dann Eigenschaften"
+          ],
+          "solution": "„Druck“ tippen, Alt + Enter",
+          "mode": "keysAndResult",
+          "expect": {
+            "sequence": [
+              "Alt+Enter"
+            ]
+          },
+          "verify": {
+            "titleRegex": "Druckwarteschlange"
+          }
+        },
+        {
+          "prompt": "Öffne das Terminal als Administrator",
+          "hints": [
+            "Schnelllink-Menü, Buchstabe für Admin"
+          ],
+          "solution": "Win + X, A",
+          "mode": "keysAndResult",
+          "expect": {
+            "sequence": [
+              "Win+X",
+              "text:a"
+            ]
+          },
+          "verify": {
+            "process": "WindowsTerminal.exe",
+            "timeoutMs": 20000
+          }
+        },
+        {
+          "prompt": "Starte die Druckwarteschlange neu",
+          "hints": [
+            "Restart-Service und der Dienstname (Spooler)",
+            "Im Admin-Fenster sieht der Trainer keine Tasten – er prüft, ob der Dienst neu gestartet ist"
+          ],
+          "solution": "Restart-Service Spooler, Enter",
+          "mode": "result",
+          "verify": {
+            "processRestarted": "spoolsv.exe",
+            "timeoutMs": 60000
+          }
+        }
+      ]
+    },
+    {
+      "id": "sz-gpo-greift-nicht",
+      "category": "Szenario",
+      "level": 2,
+      "prompt": "Gruppenrichtlinie greift nicht: Richtlinien neu laden und prüfen",
+      "hints": [
+        "Erst erzwingen, dann Ergebnis anzeigen"
+      ],
+      "solution": "Terminal → gpupdate /force → gpresult /r",
+      "mode": "scenario",
+      "steps": [
+        {
+          "prompt": "Öffne das Terminal",
+          "hints": [
+            "Schnelllink-Menü"
+          ],
+          "solution": "Win + X, I",
+          "mode": "keysAndResult",
+          "expect": {
+            "sequence": [
+              "Win+X",
+              "text:i"
+            ]
+          },
+          "verify": {
+            "process": "WindowsTerminal.exe"
+          }
+        },
+        {
+          "prompt": "Erzwinge die Aktualisierung der Gruppenrichtlinien",
+          "hints": [
+            "group policy update"
+          ],
+          "solution": "gpupdate /force, Enter",
+          "mode": "keys",
+          "expect": {
+            "sequence": [
+              "text:gpupdate /force",
+              "Enter"
+            ]
+          },
+          "context": "terminal"
+        },
+        {
+          "prompt": "Zeige die angewendeten Richtlinien an",
+          "hints": [
+            "group policy result"
+          ],
+          "solution": "gpresult /r, Enter",
+          "mode": "keys",
+          "expect": {
+            "sequence": [
+              "text:gpresult /r",
+              "Enter"
+            ]
+          },
+          "context": "terminal"
+        }
+      ]
+    },
+    {
+      "id": "sz-benutzer-gesperrt",
+      "category": "Szenario",
+      "level": 3,
+      "prompt": "Benutzer gesperrt: Konto in AD finden und entsperren",
+      "hints": [
+        "AD-Benutzer öffnen, Eigenschaften des Benutzers, Reiter Konto"
+      ],
+      "solution": "dsa.msc → Benutzer → Alt + Enter → Konto entsperren (oder Unlock-ADAccount)",
+      "mode": "scenario",
+      "unverified": true,
+      "requires": {
+        "anyFile": [
+          "%SystemRoot%\\System32\\dsa.msc"
+        ],
+        "note": "RSAT (Remoteserver-Verwaltungstools) unter Einstellungen → System → Optionale Features installieren"
+      },
+      "steps": [
+        {
+          "prompt": "Öffne „Active Directory-Benutzer und -Computer“",
+          "hints": [
+            "Ausführen-Dialog öffnen und den Befehl eintippen"
+          ],
+          "solution": "Win + R, dsa.msc, Enter",
+          "mode": "keysAndResult",
+          "expect": {
+            "sequence": [
+              "Win+R",
+              "text:dsa.msc",
+              "Enter"
+            ]
+          },
+          "verify": {
+            "process": "mmc.exe",
+            "titleRegex": "Active Directory-Benutzer"
+          }
+        },
+        {
+          "prompt": "Öffne die Eigenschaften des gesperrten Benutzers",
+          "hints": [
+            "Mit Pfeiltasten/Tippen wählen, dann Eigenschaften"
+          ],
+          "solution": "Benutzer wählen, Alt + Enter",
+          "mode": "keysAndResult",
+          "expect": {
+            "sequence": [
+              "Alt+Enter"
+            ]
+          },
+          "verify": {
+            "titleRegex": "Eigenschaften von"
+          }
+        },
+        {
+          "prompt": "Entsperre das Konto",
+          "hints": [
+            "Strg + Tab wechselt Reiter, Leertaste setzt den Haken"
+          ],
+          "solution": "Strg + Tab zum Reiter „Konto“, Haken „Konto entsperren“ mit Leertaste, Enter",
+          "mode": "keys",
+          "expect": {
+            "sequence": [
+              "Strg+Tab"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

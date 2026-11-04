@@ -4,7 +4,9 @@ using System.Runtime.InteropServices;
 using System.Security.Principal;
 using System.Windows;
 using System.Windows.Threading;
+using KeyTrainer.Core.Exercises;
 using KeyTrainer.Core.Logging;
+using KeyTrainer.Updates;
 using static KeyTrainer.Native.NativeMethods;
 
 namespace KeyTrainer;
@@ -26,6 +28,28 @@ public partial class App : Application
 
         LogEnvironment();
         base.OnStartup(e);
+
+        if (e.Args.Contains("--selftest"))
+        {
+            Shutdown(SelfTest.Run());
+            return;
+        }
+
+        var updatedFrom = Array.IndexOf(e.Args, "--updated-from");
+        if (updatedFrom >= 0 && updatedFrom + 1 < e.Args.Length)
+            Log.Info($"Nach Update gestartet (vorher {e.Args[updatedFrom + 1]})");
+        _ = Updater.CleanupAsync();
+
+        new MainWindow().Show();
+    }
+
+    /// <summary>Loads the exercise catalog embedded in the exe.</summary>
+    public static ExerciseFile LoadCatalog()
+    {
+        using var stream = typeof(App).Assembly.GetManifestResourceStream("KeyTrainer.exercises.json")
+                           ?? throw new InvalidOperationException("exercises.json fehlt in der exe.");
+        using var reader = new StreamReader(stream);
+        return ExerciseCatalog.Parse(reader.ReadToEnd());
     }
 
     protected override void OnExit(ExitEventArgs e)
@@ -36,7 +60,7 @@ public partial class App : Application
 
     static void LogEnvironment()
     {
-        var version = typeof(App).Assembly.GetName().Version;
+        var version = Updater.CurrentVersion;
         bool elevated;
         using (var identity = WindowsIdentity.GetCurrent())
             elevated = new WindowsPrincipal(identity).IsInRole(WindowsBuiltInRole.Administrator);

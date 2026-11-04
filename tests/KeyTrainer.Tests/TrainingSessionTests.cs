@@ -213,6 +213,17 @@ public class TrainingSessionTests
     }
 
     [Fact]
+    public void Verify_TitleChanged_RemembersTitleAtStepStart()
+    {
+        // The window is already in front when the step begins and changes before the first poll.
+        _world.Window = new("msedge.exe", "Chrome_WidgetWin_1", "Wikipedia – Microsoft Edge");
+        var s = Session(Goal("tab", new Verify { Process = "msedge.exe", TitleChanged = true }));
+        _world.Window = new("msedge.exe", "Chrome_WidgetWin_1", "Bing – Microsoft Edge");
+        s.Poll();
+        Assert.True(s.IsSolved);
+    }
+
+    [Fact]
     public void Verify_WindowState_ProcessGone_Restart_Lock()
     {
         var max = Session(Goal("max", new Verify { WindowClass = "CabinetWClass", WindowState = "maximized" }));

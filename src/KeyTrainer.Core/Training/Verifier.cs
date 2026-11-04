@@ -31,11 +31,18 @@ public sealed class StepBaseline
 
 public static class Verifier
 {
-    public static StepBaseline Begin(Verify? verify, IWorld world, DateTime now) => new()
+    public static StepBaseline Begin(Verify? verify, IWorld world, DateTime now)
     {
-        Started = now,
-        ProcessStart = verify?.ProcessRestarted is { } name ? world.ProcessStartTime(name) : null,
-    };
+        var baseline = new StepBaseline
+        {
+            Started = now,
+            ProcessStart = verify?.ProcessRestarted is { } name ? world.ProcessStartTime(name) : null,
+        };
+        // Remember the title right away: a fast key press may change it before the next poll.
+        if (verify is { TitleChanged: true } && world.Foreground() is { } window && WindowMatcher.Matches(verify, window))
+            baseline.Title = window.Title;
+        return baseline;
+    }
 
     /// <summary>True once every condition of <paramref name="verify"/> holds.</summary>
     public static bool IsMet(Verify verify, IWorld world, StepBaseline baseline)

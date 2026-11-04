@@ -35,7 +35,7 @@
     "cmd": {
       "label": "die Eingabeaufforderung (cmd)",
       "process": "WindowsTerminal.exe|cmd.exe|conhost.exe|OpenConsole.exe",
-      "titleRegex": "Eingabeaufforderung|cmd\\.exe"
+      "titleRegex": "Eingabeaufforderung|Command Prompt|cmd\\.exe"
     },
     "powershell": {
       "label": "PowerShell",
@@ -168,9 +168,9 @@
       },
       "auto": [
         "Win",
-        "wait:1200",
-        "text:rechner",
-        "wait:1200",
+        "wait:1500",
+        "text:calc",
+        "wait:1500",
         "Enter",
         "wait:2500"
       ]
@@ -190,9 +190,9 @@
       },
       "auto": [
         "Win",
-        "wait:1200",
-        "text:editor",
-        "wait:1200",
+        "wait:1500",
+        "text:notepad",
+        "wait:1500",
         "Enter",
         "wait:2500"
       ]
@@ -252,9 +252,9 @@
       },
       "auto": [
         "Win",
-        "wait:1200",
+        "wait:1500",
         "text:edge",
-        "wait:1200",
+        "wait:1500",
         "Enter",
         "wait:2500",
         "wait:3000"
@@ -272,7 +272,7 @@
       "mode": "result",
       "verify": {
         "windowClass": "#32770",
-        "titleRegex": "^Ausführen$"
+        "titleRegex": "^(Ausführen|Run)$"
       },
       "auto": [
         "Win+R",
@@ -314,9 +314,9 @@
       },
       "auto": [
         "Win+S",
-        "wait:1200",
-        "text:editor",
-        "wait:1200",
+        "wait:1500",
+        "text:notepad",
+        "wait:1500",
         "Enter",
         "wait:2500"
       ]
@@ -344,9 +344,9 @@
           },
           "auto": [
             "Win",
-            "wait:1200",
-            "text:editor",
-            "wait:1200",
+            "wait:1500",
+            "text:notepad",
+            "wait:1500",
             "Enter",
             "wait:2500"
           ]
@@ -426,9 +426,9 @@
           },
           "auto": [
             "Win",
-            "wait:1200",
-            "text:editor",
-            "wait:1200",
+            "wait:1500",
+            "text:notepad",
+            "wait:1500",
             "Enter",
             "wait:2500"
           ]
@@ -486,9 +486,9 @@
           },
           "auto": [
             "Win",
-            "wait:1200",
-            "text:editor",
-            "wait:1200",
+            "wait:1500",
+            "text:notepad",
+            "wait:1500",
             "Enter",
             "wait:2500"
           ]
@@ -633,9 +633,9 @@
           },
           "auto": [
             "Win",
-            "wait:1200",
-            "text:editor",
-            "wait:1200",
+            "wait:1500",
+            "text:notepad",
+            "wait:1500",
             "Enter",
             "wait:2500",
             "Win+Pfeil rechts",
@@ -937,7 +937,7 @@
           "solution": "Alt + Enter",
           "mode": "result",
           "verify": {
-            "titleRegex": "Eigenschaften.*KT-Test2|KT-Test2.*Eigenschaften"
+            "titleRegex": "(Eigenschaften|Properties).*KT-Test2|KT-Test2.*(Eigenschaften|Properties)"
           },
           "auto": [
             "Alt+Enter",
@@ -1068,7 +1068,7 @@
           "verify": {
             "process": "explorer.exe",
             "windowClass": "CabinetWClass",
-            "titleRegex": "txt|Suchergebnisse"
+            "titleRegex": "txt|Suchergebnisse|Search Results"
           },
           "auto": [
             "Strg+E",
@@ -1130,9 +1130,9 @@
           },
           "auto": [
             "Win",
-            "wait:1200",
-            "text:editor",
-            "wait:1200",
+            "wait:1500",
+            "text:notepad",
+            "wait:1500",
             "Enter",
             "wait:2500"
           ]
@@ -1271,9 +1271,9 @@
           "context": "editor",
           "auto": [
             "Win",
-            "wait:1200",
-            "text:editor",
-            "wait:1200",
+            "wait:1500",
+            "text:notepad",
+            "wait:1500",
             "Enter",
             "wait:2500",
             "text:Das ist ein Satz"
@@ -1419,9 +1419,9 @@
           },
           "auto": [
             "Win",
-            "wait:1200",
+            "wait:1500",
             "text:edge",
-            "wait:1200",
+            "wait:1500",
             "Enter",
             "wait:2500",
             "wait:3000"
@@ -1524,9 +1524,9 @@
           },
           "auto": [
             "Win",
-            "wait:1200",
+            "wait:1500",
             "text:edge",
-            "wait:1200",
+            "wait:1500",
             "Enter",
             "wait:2500",
             "wait:3000"
@@ -1577,9 +1577,9 @@
           },
           "auto": [
             "Win",
-            "wait:1200",
+            "wait:1500",
             "text:edge",
-            "wait:1200",
+            "wait:1500",
             "Enter",
             "wait:2500",
             "wait:3000",
@@ -1705,13 +1705,13 @@
       "mode": "result",
       "verify": {
         "process": "msedge.exe|chrome.exe|firefox.exe|brave.exe",
-        "titleRegex": "InPrivate|Inkognito|Privat"
+        "titleRegex": "InPrivate|Inkognito|Incognito|Privat|Private"
       },
       "auto": [
         "Win",
-        "wait:1200",
+        "wait:1500",
         "text:edge",
-        "wait:1200",
+        "wait:1500",
         "Enter",
         "wait:2500",
         "wait:3000",
@@ -1757,7 +1757,7 @@
       "mode": "result",
       "verify": {
         "process": "mmc.exe",
-        "titleRegex": "Dienste"
+        "titleRegex": "Dienste|Services"
       },
       "auto": [
         "Win+R",
@@ -1780,7 +1780,7 @@
       "mode": "result",
       "verify": {
         "process": "mmc.exe",
-        "titleRegex": "Ereignisanzeige"
+        "titleRegex": "Ereignisanzeige|Event Viewer"
       },
       "auto": [
         "Win+R",
@@ -1803,7 +1803,7 @@
       "mode": "result",
       "verify": {
         "process": "mmc.exe",
-        "titleRegex": "Computerverwaltung"
+        "titleRegex": "Computerverwaltung|Computer Management"
       },
       "auto": [
         "Win+R",
@@ -1826,7 +1826,7 @@
       "mode": "result",
       "verify": {
         "process": "mmc.exe",
-        "titleRegex": "Geräte-Manager"
+        "titleRegex": "Geräte-Manager|Device Manager"
       },
       "auto": [
         "Win+R",
@@ -1849,7 +1849,7 @@
       "mode": "result",
       "verify": {
         "process": "mmc.exe",
-        "titleRegex": "Datenträgerverwaltung"
+        "titleRegex": "Datenträgerverwaltung|Disk Management"
       },
       "elevated": true,
       "auto": [
@@ -1873,7 +1873,7 @@
       "mode": "result",
       "verify": {
         "process": "mmc.exe",
-        "titleRegex": "Lokale Benutzer|lusrmgr"
+        "titleRegex": "Lokale Benutzer|Local Users|lusrmgr"
       },
       "requires": "windows-pro",
       "auto": [
@@ -1896,7 +1896,7 @@
       "solution": "Win + R, ncpa.cpl, Enter",
       "mode": "result",
       "verify": {
-        "titleRegex": "Netzwerkverbindungen"
+        "titleRegex": "Netzwerkverbindungen|Network Connections"
       },
       "auto": [
         "Win+R",
@@ -1918,7 +1918,7 @@
       "solution": "Win + R, appwiz.cpl, Enter",
       "mode": "result",
       "verify": {
-        "titleRegex": "Programme und Features"
+        "titleRegex": "Programme und Features|Programs and Features"
       },
       "auto": [
         "Win+R",
@@ -1940,7 +1940,7 @@
       "solution": "Win + R, sysdm.cpl, Enter",
       "mode": "result",
       "verify": {
-        "titleRegex": "Systemeigenschaften"
+        "titleRegex": "Systemeigenschaften|System Properties"
       },
       "auto": [
         "Win+R",
@@ -2006,7 +2006,7 @@
       "solution": "Win + R, control, Enter",
       "mode": "result",
       "verify": {
-        "titleRegex": "Systemsteuerung"
+        "titleRegex": "Systemsteuerung|Control Panel"
       },
       "auto": [
         "Win+R",
@@ -2029,7 +2029,7 @@
       "mode": "result",
       "verify": {
         "process": "mmc.exe",
-        "titleRegex": "Aufgabenplanung"
+        "titleRegex": "Aufgabenplanung|Task Scheduler"
       },
       "auto": [
         "Win+R",
@@ -2052,7 +2052,7 @@
       "mode": "result",
       "verify": {
         "process": "mmc.exe",
-        "titleRegex": "Gruppenrichtlinien"
+        "titleRegex": "Gruppenrichtlinien|Group Policy"
       },
       "requires": "windows-pro",
       "elevated": true,
@@ -2101,7 +2101,7 @@
       "mode": "result",
       "verify": {
         "process": "mmc.exe",
-        "titleRegex": "Druckverwaltung"
+        "titleRegex": "Druckverwaltung|Print Management"
       },
       "requires": "print-management",
       "elevated": true,
@@ -2126,7 +2126,7 @@
       "mode": "result",
       "verify": {
         "process": "mmc.exe",
-        "titleRegex": "Zertifikate|certmgr"
+        "titleRegex": "Zertifikate|Certificates|certmgr"
       },
       "auto": [
         "Win+R",
@@ -2148,7 +2148,7 @@
       "solution": "Win + R, resmon, Enter",
       "mode": "result",
       "verify": {
-        "titleRegex": "Ressourcenmonitor"
+        "titleRegex": "Ressourcenmonitor|Resource Monitor"
       },
       "auto": [
         "Win+R",
@@ -2171,7 +2171,7 @@
       "mode": "result",
       "verify": {
         "process": "mmc.exe",
-        "titleRegex": "Leistungsüberwachung"
+        "titleRegex": "Leistungsüberwachung|Performance Monitor"
       },
       "auto": [
         "Win+R",
@@ -2216,7 +2216,7 @@
       "solution": "Win + R, powercfg.cpl, Enter",
       "mode": "result",
       "verify": {
-        "titleRegex": "Energieoptionen|Energie"
+        "titleRegex": "Energieoptionen|Energie|Power Options"
       },
       "unverified": true,
       "auto": [
@@ -2240,7 +2240,7 @@
       "mode": "result",
       "verify": {
         "process": "mmc.exe",
-        "titleRegex": "Sicherheitsrichtlinie"
+        "titleRegex": "Sicherheitsrichtlinie|Security Policy"
       },
       "requires": "windows-pro",
       "elevated": true,
@@ -2265,7 +2265,7 @@
       "mode": "result",
       "verify": {
         "process": "mmc.exe",
-        "titleRegex": "Freigegebene Ordner"
+        "titleRegex": "Freigegebene Ordner|Shared Folders"
       },
       "auto": [
         "Win+R",
@@ -2287,7 +2287,7 @@
       "solution": "Win + R, optionalfeatures, Enter",
       "mode": "result",
       "verify": {
-        "titleRegex": "Windows-Features"
+        "titleRegex": "Windows-Features|Windows Features"
       },
       "elevated": true,
       "auto": [
@@ -2318,7 +2318,7 @@
           "mode": "result",
           "verify": {
             "process": "mmc.exe",
-            "titleRegex": "Dienste"
+            "titleRegex": "Dienste|Services"
           },
           "auto": [
             "Win+R",
@@ -2337,7 +2337,7 @@
           "solution": "Tab, „Druck“ tippen, Alt + Enter",
           "mode": "result",
           "verify": {
-            "titleRegex": "Druckwarteschlange"
+            "titleRegex": "Druckwarteschlange|Print Spooler"
           },
           "auto": [
             "Tab",
@@ -2369,7 +2369,7 @@
           "solution": "Win + R, ncpa.cpl, Enter",
           "mode": "result",
           "verify": {
-            "titleRegex": "Netzwerkverbindungen"
+            "titleRegex": "Netzwerkverbindungen|Network Connections"
           },
           "auto": [
             "Win+R",
@@ -2388,7 +2388,7 @@
           "solution": "Pfeiltasten, Alt + Enter",
           "mode": "result",
           "verify": {
-            "titleRegex": "Eigenschaften von"
+            "titleRegex": "Eigenschaften von|Properties"
           },
           "auto": [
             "Pfeil runter",
@@ -3741,7 +3741,7 @@
       "mode": "result",
       "verify": {
         "process": "mmc.exe",
-        "titleRegex": "Active Directory-Benutzer"
+        "titleRegex": "Active Directory-Benutzer|Active Directory Users"
       },
       "requires": "rsat-ad",
       "auto": [
@@ -3765,7 +3765,7 @@
       "mode": "result",
       "verify": {
         "process": "mmc.exe",
-        "titleRegex": "Gruppenrichtlinienverwaltung"
+        "titleRegex": "Gruppenrichtlinienverwaltung|Group Policy Management"
       },
       "requires": "rsat-gpmc",
       "auto": [
@@ -3837,7 +3837,7 @@
       "mode": "result",
       "verify": {
         "process": "mmc.exe",
-        "titleRegex": "Standorte"
+        "titleRegex": "Standorte|Sites"
       },
       "requires": "rsat-ad",
       "auto": [
@@ -3892,7 +3892,7 @@
           "mode": "result",
           "verify": {
             "process": "mmc.exe",
-            "titleRegex": "Active Directory-Benutzer"
+            "titleRegex": "Active Directory-Benutzer|Active Directory Users"
           },
           "auto": [
             "Win+R",
@@ -3910,7 +3910,7 @@
           "solution": "Pfeiltasten, Tab, Alt + Enter",
           "mode": "result",
           "verify": {
-            "titleRegex": "Eigenschaften von"
+            "titleRegex": "Eigenschaften von|Properties"
           }
         }
       ],

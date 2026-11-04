@@ -323,3 +323,5 @@ Wenn ein manueller Test scheitert: Beschreibe Claude Code genau, was du gedrück
 - **Overlay oben mittig** am Bildschirmrand (Nutzerwunsch 04.11.), nicht rechts.
 - **Update-Knopf:** lädt die neueste Version aus GitHub-Releases (öffentlich, Nutzerentscheidung), prüft SHA-256, tauscht die exe und startet neu.
 - **Katalog erweitert** um FISI-Themen (Konsolen, Server/AD, Kommandozeile, Terminal, Fernwartung, Linux/SSH, Büro, Alltags-Szenarien), 152 Übungen; Felder `requires`, `elevated`, `unverified`, `contexts`.
+- **Raw Input verworfen (04.11.):** In der VM kamen Win+R/Win+E nur als „Win“ an – die Shell schluckt solche Kürzel vor Raw Input. Erfassung jetzt per Low-Level-Hook (nur beobachten). Der CI-Selbsttest schickt Win+R per SendInput und prüft die Erkennung.
+- **Phase 2 (04.11.):** Aufgaben-Leiste oben mittig, Modi Lernen/Quiz, gestufte Hinweise (Tipps → erste Taste → Lösung; automatisch nach 20 s bzw. 2 Fehlversuchen), Fehlererklärungen, Kontextprüfung des Vordergrundfensters, Trainer-Kürzel Strg+Shift+F1–F4. Übungen mit `keysAndResult` prüfen vorerst nur die Tasten; `result` und Szenarien folgen mit Phase 3.

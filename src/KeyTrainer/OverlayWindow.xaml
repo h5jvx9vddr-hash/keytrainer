@@ -1,0 +1,52 @@
+<Window x:Class="KeyTrainer.OverlayWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="KeyTrainer – Aufgabe"
+        ThemeMode="None"
+        WindowStyle="None" AllowsTransparency="True" Background="Transparent"
+        ResizeMode="NoResize" Topmost="True" ShowInTaskbar="False" ShowActivated="False" Focusable="False"
+        SizeToContent="Height" Width="760"
+        FontFamily="Segoe UI Variable Text, Segoe UI" Foreground="#F2F2F2">
+    <Window.Resources>
+        <FontFamily x:Key="IconFont">Segoe Fluent Icons, Segoe MDL2 Assets</FontFamily>
+        <SolidColorBrush x:Key="Muted" Color="#A8A8A8" />
+    </Window.Resources>
+
+    <!-- Dark card so it stays readable above any program -->
+    <Border x:Name="Card" Margin="12,8,12,16" CornerRadius="12" Background="#F01C1C1C" BorderBrush="#40FFFFFF" BorderThickness="1"
+            Padding="20,14">
+        <Border.Effect>
+            <DropShadowEffect BlurRadius="18" ShadowDepth="3" Opacity="0.45" />
+        </Border.Effect>
+        <StackPanel>
+            <!-- Meta line -->
+            <DockPanel x:Name="MetaRow">
+                <TextBlock x:Name="TimerText" DockPanel.Dock="Right" Foreground="{StaticResource Muted}" FontFamily="Consolas" VerticalAlignment="Center" Text="0:00" />
+                <StackPanel Orientation="Horizontal">
+                    <Border CornerRadius="4" Padding="7,1" Background="#3A6FD8" VerticalAlignment="Center">
+                        <TextBlock x:Name="CategoryText" FontSize="11" FontWeight="SemiBold" Text="Kategorie" />
+                    </Border>
+                    <TextBlock x:Name="MetaText" Margin="10,0,0,0" FontSize="12" Foreground="{StaticResource Muted}" VerticalAlignment="Center" />
+                </StackPanel>
+            </DockPanel>
+
+            <!-- Task -->
+            <TextBlock x:Name="PromptText" Margin="0,8,0,0" FontSize="20" FontWeight="SemiBold" TextWrapping="Wrap" Text="Aufgabe" />
+
+            <!-- Hint -->
+            <StackPanel x:Name="HintRow" Orientation="Horizontal" Margin="0,8,0,0" Visibility="Collapsed">
+                <TextBlock FontFamily="{StaticResource IconFont}" Text="&#xE82F;" Foreground="#F5C451" FontSize="14" VerticalAlignment="Top" Margin="0,2,8,0" />
+                <TextBlock x:Name="HintText" FontSize="14" Foreground="#F5DFA0" TextWrapping="Wrap" MaxWidth="660" />
+            </StackPanel>
+
+            <!-- Feedback -->
+            <Border x:Name="FeedbackBox" Margin="0,10,0,0" CornerRadius="6" Padding="10,5" Visibility="Collapsed">
+                <TextBlock x:Name="FeedbackText" FontSize="14" FontWeight="SemiBold" TextWrapping="Wrap" />
+            </Border>
+
+            <!-- Trainer shortcuts -->
+            <TextBlock x:Name="LegendText" Margin="0,10,0,0" FontSize="11" Foreground="{StaticResource Muted}"
+                       Text="Strg + Shift + F1 Hinweis   ·   F2 Überspringen   ·   F3 Pause   ·   F4 Einklappen" />
+        </StackPanel>
+    </Border>
+</Window>

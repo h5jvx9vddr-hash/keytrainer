@@ -13,44 +13,56 @@
   "contexts": {
     "explorer": {
       "process": "explorer.exe",
-      "windowClass": "CabinetWClass"
+      "windowClass": "CabinetWClass",
+      "label": "den Explorer"
     },
     "terminal": {
-      "process": "WindowsTerminal.exe|cmd.exe|powershell.exe|pwsh.exe|conhost.exe|OpenConsole.exe"
+      "process": "WindowsTerminal.exe|cmd.exe|powershell.exe|pwsh.exe|conhost.exe|OpenConsole.exe",
+      "label": "das Terminal"
     },
     "windowsTerminal": {
-      "process": "WindowsTerminal.exe"
+      "process": "WindowsTerminal.exe",
+      "label": "Windows Terminal"
     },
     "cmd": {
       "process": "WindowsTerminal.exe|cmd.exe|conhost.exe|OpenConsole.exe",
-      "titleRegex": "Eingabeaufforderung|cmd\\.exe"
+      "titleRegex": "Eingabeaufforderung|cmd\\.exe",
+      "label": "die Eingabeaufforderung (cmd)"
     },
     "powershell": {
       "process": "WindowsTerminal.exe|powershell.exe|pwsh.exe|conhost.exe|OpenConsole.exe",
-      "titleRegex": "PowerShell"
+      "titleRegex": "PowerShell",
+      "label": "PowerShell"
     },
     "browser": {
-      "process": "msedge.exe|chrome.exe|firefox.exe|brave.exe"
+      "process": "msedge.exe|chrome.exe|firefox.exe|brave.exe",
+      "label": "den Browser"
     },
     "practice": {
       "process": "msedge.exe|chrome.exe|firefox.exe|brave.exe",
-      "titleRegex": "KeyTrainer-Übungsseite|KT-OK-"
+      "titleRegex": "KeyTrainer-Übungsseite|KT-OK-",
+      "label": "die Übungsseite im Browser"
     },
     "services": {
       "process": "mmc.exe",
-      "titleRegex": "Dienste"
+      "titleRegex": "Dienste",
+      "label": "die Dienste-Verwaltung"
     },
     "rdp": {
-      "process": "mstsc.exe"
+      "process": "mstsc.exe",
+      "label": "die Remotedesktop-Sitzung"
     },
     "vmconsole": {
-      "process": "vmware.exe|vmplayer.exe|vmconnect.exe"
+      "process": "vmware.exe|vmplayer.exe|vmconnect.exe",
+      "label": "die VM-Konsole"
     },
     "outlook": {
-      "process": "OUTLOOK.EXE|olk.exe"
+      "process": "OUTLOOK.EXE|olk.exe",
+      "label": "Outlook"
     },
     "teams": {
-      "process": "ms-teams.exe|Teams.exe"
+      "process": "ms-teams.exe|Teams.exe",
+      "label": "Teams"
     }
   },
   "exercises": [

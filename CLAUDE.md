@@ -18,7 +18,7 @@ Offene Punkte: Todo-App (`todo ls -p keytrainer`), nicht hier.
 ## Regeln
 - Tastatureingaben niemals in Dateien oder Logs schreiben; getippter Text nur als „passt/passt nicht“.
 - Logging über `KeyTrainer.Core.Logging.Log` (Tagesdatei in `%APPDATA%\KeyTrainer\logs`, 14 Tage). Jeder Fehler wird mit Exception und Win32-Fehlercode geloggt; unbehandelte Fehler fängt `App.xaml.cs`. Ins Log nur Zustände, Zähler, Fehler – nie Tasten.
-- Eingabeerfassung (Raw Input) nur während einer laufenden Übung aktiv.
+- Eingabeerfassung per `WH_KEYBOARD_LL` (`Input/KeyboardSource.cs`) – nur beobachten, immer `CallNextHookEx`, nie blockieren. Aktiv nur während Training (nicht pausiert) oder Erkennungstest. Raw Input reicht nicht: Win+R & Co. kommen dort nie an.
 - Trainer-Kürzel über RegisterHotKey, nie über die Eingabeerfassung; keine `Strg+Alt`-Kürzel (AltGr).
 - Alle Win32-Aufrufe gesammelt in `src/KeyTrainer/Native/NativeMethods.cs`.
 - Übungen nur in `Assets/exercises.json`, nie im Code.

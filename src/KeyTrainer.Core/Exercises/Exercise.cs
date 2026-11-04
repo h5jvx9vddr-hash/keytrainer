@@ -84,6 +84,9 @@ public sealed class Expect
 
 public class WindowMatch
 {
+    /// <summary>Display name for messages like "Wechsle zuerst in den Explorer".</summary>
+    public string? Label { get; init; }
+
     /// <summary>Process name(s), alternatives separated by "|", compared case-insensitively.</summary>
     public string? Process { get; init; }
 
@@ -115,4 +118,7 @@ public sealed class Requirements
 
     /// <summary>Shown when the requirement is missing, e.g. "RSAT installieren".</summary>
     public string? Note { get; init; }
+
+    public bool IsMet(Func<string, bool> fileExists) =>
+        AnyFile.Any(f => fileExists(Environment.ExpandEnvironmentVariables(f)));
 }

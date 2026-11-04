@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="KeyTrainer"
         Icon="app.ico"
-        Width="560" Height="680" MinWidth="440" MinHeight="460"
+        Width="600" Height="720" MinWidth="460" MinHeight="480"
         WindowStartupLocation="CenterScreen">
     <Window.Resources>
         <FontFamily x:Key="IconFont">Segoe Fluent Icons, Segoe MDL2 Assets</FontFamily>
@@ -57,83 +57,117 @@
 
         <!-- Header -->
         <StackPanel Grid.Row="0">
-            <TextBlock Text="Erkennungstest" FontSize="28" FontWeight="SemiBold" />
+            <TextBlock Text="KeyTrainer" FontSize="28" FontWeight="SemiBold" />
             <TextBlock Style="{StaticResource Secondary}" Margin="0,4,0,0" TextWrapping="Wrap"
-                       Text="Zeigt jede erkannte Tastenkombination – auch wenn ein anderes Programm im Vordergrund ist. Eingaben bleiben im Speicher und werden nie gespeichert." />
+                       Text="Übe Tastenkürzel in den echten Programmen. Die Aufgabe erscheint oben am Bildschirmrand." />
         </StackPanel>
 
-        <!-- Actions -->
-        <WrapPanel Grid.Row="1" Margin="0,16,0,0">
-            <Button x:Name="StartButton" Style="{DynamicResource AccentButtonStyle}" Padding="16,8" Margin="0,0,8,8" Click="OnToggle">
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock x:Name="StartIcon" Style="{StaticResource Icon}" Text="&#xE768;" />
-                    <TextBlock x:Name="StartLabel" Text="Erfassung starten" />
-                </StackPanel>
-            </Button>
-            <Button Padding="14,8" Margin="0,0,8,8" Click="OnClear">
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock Style="{StaticResource Icon}" Text="&#xE74D;" />
-                    <TextBlock Text="Leeren" />
-                </StackPanel>
-            </Button>
-            <Button Padding="14,8" Margin="0,0,8,8" Click="OnOpenLog">
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock Style="{StaticResource Icon}" Text="&#xE838;" />
-                    <TextBlock Text="Log-Ordner" />
-                </StackPanel>
-            </Button>
-        </WrapPanel>
-
-        <!-- Status -->
-        <Border Grid.Row="2" Style="{StaticResource Card}" Margin="0,8,0,12">
-            <DockPanel>
-                <TextBlock x:Name="CountText" DockPanel.Dock="Right" Style="{StaticResource Secondary}" VerticalAlignment="Center" Text="0 Eingaben" />
-                <StackPanel Orientation="Horizontal">
-                    <Ellipse x:Name="StatusDot" Width="10" Height="10" Margin="0,0,10,0" VerticalAlignment="Center"
-                             Fill="{DynamicResource TextFillColorDisabledBrush}" />
-                    <TextBlock x:Name="StatusText" Text="Erfassung aus" FontWeight="SemiBold" VerticalAlignment="Center" />
-                </StackPanel>
-            </DockPanel>
+        <!-- Training -->
+        <Border Grid.Row="1" Style="{StaticResource Card}" Margin="0,16,0,12">
+            <StackPanel>
+                <TextBlock Text="Training" FontSize="16" FontWeight="SemiBold" />
+                <Grid Margin="0,10,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="12" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0">
+                        <TextBlock Text="Modus" Style="{StaticResource Secondary}" Margin="0,0,0,4" />
+                        <ComboBox x:Name="ModeBox" SelectedIndex="1" SelectionChanged="OnFilterChanged">
+                            <ComboBoxItem Content="Lernen – Lösung wird angezeigt" />
+                            <ComboBoxItem Content="Quiz – nur die Aufgabe" />
+                        </ComboBox>
+                    </StackPanel>
+                    <StackPanel Grid.Column="2">
+                        <TextBlock Text="Bereich" Style="{StaticResource Secondary}" Margin="0,0,0,4" />
+                        <ComboBox x:Name="CategoryBox" IsEditable="True" IsTextSearchEnabled="True" SelectionChanged="OnFilterChanged" />
+                    </StackPanel>
+                </Grid>
+                <DockPanel Margin="0,12,0,0">
+                    <Button x:Name="TrainButton" DockPanel.Dock="Left" Style="{DynamicResource AccentButtonStyle}" Padding="16,8" Click="OnTrain">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock x:Name="TrainIcon" Style="{StaticResource Icon}" Text="&#xE768;" />
+                            <TextBlock x:Name="TrainLabel" Text="Training starten" />
+                        </StackPanel>
+                    </Button>
+                    <TextBlock x:Name="PoolText" Style="{StaticResource Secondary}" Margin="12,0,0,0" VerticalAlignment="Center" TextWrapping="Wrap" />
+                </DockPanel>
+                <TextBlock x:Name="SessionText" Style="{StaticResource Secondary}" Margin="0,8,0,0" TextWrapping="Wrap" Visibility="Collapsed" />
+            </StackPanel>
         </Border>
 
-        <!-- Detected input -->
-        <Border Grid.Row="3" Style="{StaticResource Card}" Padding="4">
-            <Grid>
-                <TextBlock x:Name="EmptyText" Style="{StaticResource Secondary}" HorizontalAlignment="Center" VerticalAlignment="Center"
-                           TextAlignment="Center" TextWrapping="Wrap" Margin="24"
-                           Text="Noch keine Eingaben.&#x0a;Starte die Erfassung und drücke z. B. Win + R." />
-                <ScrollViewer VerticalScrollBarVisibility="Auto">
-                    <ItemsControl x:Name="TokenList">
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <Grid Margin="12,8">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="72" />
-                                        <ColumnDefinition Width="*" />
-                                    </Grid.ColumnDefinitions>
-                                    <TextBlock Text="{Binding Time}" Style="{StaticResource Secondary}" VerticalAlignment="Center" FontFamily="Consolas" />
-                                    <ItemsControl Grid.Column="1" ItemsSource="{Binding Parts}" ItemTemplate="{StaticResource KeyPartTemplate}"
-                                                  Visibility="{Binding ComboVisibility}">
-                                        <ItemsControl.ItemsPanel>
-                                            <ItemsPanelTemplate>
-                                                <WrapPanel />
-                                            </ItemsPanelTemplate>
-                                        </ItemsControl.ItemsPanel>
-                                    </ItemsControl>
-                                    <StackPanel Grid.Column="1" Orientation="Horizontal" Visibility="{Binding TextVisibility}">
-                                        <Border Padding="6,1" CornerRadius="4" Margin="0,0,8,0" VerticalAlignment="Center"
-                                                Background="{DynamicResource AccentFillColorDefaultBrush}">
-                                            <TextBlock Text="Text" FontSize="11" FontWeight="SemiBold"
-                                                       Foreground="{DynamicResource TextOnAccentFillColorPrimaryBrush}" />
-                                        </Border>
-                                        <TextBlock Text="{Binding Text}" FontFamily="Consolas" FontSize="15" VerticalAlignment="Center" />
-                                    </StackPanel>
-                                </Grid>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-                </ScrollViewer>
-            </Grid>
+        <!-- Detection test -->
+        <Expander x:Name="DebugExpander" Grid.Row="2" Header="Erkennungstest – zeigt jede erkannte Tastenkombination" Margin="0,0,0,8"
+                  Expanded="OnDebugExpanded" Collapsed="OnDebugExpanded" />
+
+        <Border Grid.Row="3" x:Name="DebugArea" Style="{StaticResource Card}" Padding="12" Visibility="Collapsed">
+            <DockPanel>
+                <DockPanel DockPanel.Dock="Top" Margin="4,0,4,8">
+                    <WrapPanel DockPanel.Dock="Left">
+                        <Button x:Name="StartButton" Padding="12,6" Margin="0,0,8,0" Click="OnToggle">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock x:Name="StartIcon" Style="{StaticResource Icon}" Text="&#xE768;" />
+                                <TextBlock x:Name="StartLabel" Text="Erfassung starten" />
+                            </StackPanel>
+                        </Button>
+                        <Button Padding="12,6" Margin="0,0,8,0" Click="OnClear">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Style="{StaticResource Icon}" Text="&#xE74D;" />
+                                <TextBlock Text="Leeren" />
+                            </StackPanel>
+                        </Button>
+                        <Button Padding="12,6" Click="OnOpenLog">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Style="{StaticResource Icon}" Text="&#xE838;" />
+                                <TextBlock Text="Log-Ordner" />
+                            </StackPanel>
+                        </Button>
+                    </WrapPanel>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                        <Ellipse x:Name="StatusDot" Width="10" Height="10" Margin="0,0,8,0" VerticalAlignment="Center"
+                                 Fill="{DynamicResource TextFillColorDisabledBrush}" />
+                        <TextBlock x:Name="StatusText" Text="Erfassung aus" VerticalAlignment="Center" />
+                        <TextBlock x:Name="CountText" Style="{StaticResource Secondary}" Margin="10,0,0,0" VerticalAlignment="Center" Text="0 Eingaben" />
+                    </StackPanel>
+                </DockPanel>
+                <Grid>
+                    <TextBlock x:Name="EmptyText" Style="{StaticResource Secondary}" HorizontalAlignment="Center" VerticalAlignment="Center"
+                               TextAlignment="Center" TextWrapping="Wrap" Margin="24"
+                               Text="Noch keine Eingaben.&#x0a;Starte die Erfassung und drücke z. B. Win + R." />
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <ItemsControl x:Name="TokenList">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Margin="8,6">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="72" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Text="{Binding Time}" Style="{StaticResource Secondary}" VerticalAlignment="Center" FontFamily="Consolas" />
+                                        <ItemsControl Grid.Column="1" ItemsSource="{Binding Parts}" ItemTemplate="{StaticResource KeyPartTemplate}"
+                                                      Visibility="{Binding ComboVisibility}">
+                                            <ItemsControl.ItemsPanel>
+                                                <ItemsPanelTemplate>
+                                                    <WrapPanel />
+                                                </ItemsPanelTemplate>
+                                            </ItemsControl.ItemsPanel>
+                                        </ItemsControl>
+                                        <StackPanel Grid.Column="1" Orientation="Horizontal" Visibility="{Binding TextVisibility}">
+                                            <Border Padding="6,1" CornerRadius="4" Margin="0,0,8,0" VerticalAlignment="Center"
+                                                    Background="{DynamicResource AccentFillColorDefaultBrush}">
+                                                <TextBlock Text="Text" FontSize="11" FontWeight="SemiBold"
+                                                           Foreground="{DynamicResource TextOnAccentFillColorPrimaryBrush}" />
+                                            </Border>
+                                            <TextBlock Text="{Binding Text}" FontFamily="Consolas" FontSize="15" VerticalAlignment="Center" />
+                                        </StackPanel>
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+                </Grid>
+            </DockPanel>
         </Border>
 
         <!-- Version / update -->

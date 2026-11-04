@@ -1,6 +1,10 @@
+using System.Runtime.InteropServices;
+using System.Windows.Threading;
 using KeyTrainer.Core.Input;
 using KeyTrainer.Core.Logging;
+using KeyTrainer.Core.Training;
 using KeyTrainer.Input;
+using static KeyTrainer.Native.NativeMethods;
 
 namespace KeyTrainer;
 
@@ -19,10 +23,20 @@ internal static class SelfTest
             Log.Info($"Selbsttest: Katalog mit {catalog.Exercises.Count} Übungen geladen");
 
             var detector = new ComboDetector();
-            using var source = new RawKeyboardSource(detector);
+            using var source = new KeyboardSource(detector);
             source.Start();
             source.Stop();
-            Log.Info("Selbsttest: Raw Input registriert und wieder entfernt");
+            Log.Info("Selbsttest: Tastatur-Hook installiert und wieder entfernt");
+
+            using (var hotkeys = new TrainerHotkeys())
+                Log.Info("Selbsttest: Trainer-Kürzel registriert und wieder freigegeben");
+
+            var foreground = ForegroundWindow.Snapshot();
+            Log.Info($"Selbsttest: Vordergrundfenster gelesen ({(foreground is null ? "keins" : "Prozess " + foreground.Process)})");
+
+            var session = new TrainingSession(catalog.Exercises, TrainingMode.Quiz, catalog.Contexts);
+            for (int i = 0; i < session.PoolSize; i++) session.Next();
+            Log.Info($"Selbsttest: alle {session.PoolSize} trainierbaren Übungen einmal gestellt");
 
             // Many calls, so buffer overruns in the ToUnicodeEx interop corrupt the heap and crash here, not on the user's PC.
             for (int i = 0; i < 2000; i++)
@@ -33,6 +47,8 @@ internal static class SelfTest
             detector.Process(new KeyEvent(Vk.LShift, false));
 
             Expect(source.Translate(Vk.Return, 0x1C), "\r", "Enter", failures, log: true);
+
+            CheckShellShortcut(failures);
         }
         catch (Exception ex)
         {
@@ -47,6 +63,63 @@ internal static class SelfTest
         }
         Log.Error("Selbsttest: FEHLGESCHLAGEN – " + string.Join("; ", failures));
         return 1;
+    }
+
+    /// <summary>
+    /// Win+R is swallowed by the shell before Raw Input sees it (bug in 0.2.5). Send it for real and
+    /// check the hook reports exactly "Win+R"; Esc closes the Run dialog again.
+    /// </summary>
+    static void CheckShellShortcut(List<string> failures)
+    {
+        var detector = new ComboDetector();
+        var tokens = new List<string>();
+        detector.TokenDetected += t => tokens.Add(t.ToString());
+        using var source = new KeyboardSource(detector);
+        source.Start();
+
+        uint sent = SendKeys(Vk.LWin, 'R');
+        Pump(TimeSpan.FromSeconds(1.5));
+        SendKeys(Vk.Escape);
+        Pump(TimeSpan.FromSeconds(0.5));
+        source.Stop();
+
+        if (sent == 0)
+        {
+            Log.Warn($"Selbsttest: SendInput nicht möglich (Win32-Fehler {Marshal.GetLastWin32Error()}), Win+R-Test übersprungen");
+            return;
+        }
+        // Synthetic keys only – nothing typed by a person.
+        Log.Info($"Selbsttest: Hook meldete [{string.Join(", ", tokens)}]");
+        if (!tokens.Contains("Win+R")) failures.Add($"Win+R nicht erkannt, erhalten: [{string.Join(", ", tokens)}]");
+        else if (tokens.Contains("Win")) failures.Add("Win+R wurde zusätzlich als einzelnes Win gemeldet");
+        else Log.Info("Selbsttest: Win+R über den Hook erkannt");
+    }
+
+    /// <summary>Presses the keys in order and releases them in reverse order.</summary>
+    static uint SendKeys(params int[] keys)
+    {
+        var inputs = keys.Select(k => Key(k, up: false)).Concat(keys.Reverse().Select(k => Key(k, up: true))).ToArray();
+        return SendInput((uint)inputs.Length, inputs, Marshal.SizeOf<INPUT>());
+    }
+
+    static INPUT Key(int vk, bool up) => new()
+    {
+        Type = INPUT_KEYBOARD,
+        U = new InputUnion { Keyboard = new KEYBDINPUT { Vk = (ushort)vk, Flags = up ? KEYEVENTF_KEYUP : 0 } },
+    };
+
+    /// <summary>Runs the message loop for a while so hook callbacks and queued work are delivered.</summary>
+    static void Pump(TimeSpan duration)
+    {
+        var frame = new DispatcherFrame();
+        var timer = new DispatcherTimer { Interval = duration };
+        timer.Tick += (_, _) =>
+        {
+            timer.Stop();
+            frame.Continue = false;
+        };
+        timer.Start();
+        Dispatcher.PushFrame(frame);
     }
 
     static void Expect(string? actual, string expected, string what, List<string> failures, bool log)

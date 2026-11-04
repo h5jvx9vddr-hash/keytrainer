@@ -11,6 +11,8 @@ Offene Punkte: Todo-App (`todo ls -p keytrainer`), nicht hier.
 - `src/KeyTrainer/Assets/exercises.json` – Übungskatalog (in die exe eingebettet, Test `ExerciseCatalogTests` prüft ihn).
 
 ## Arbeitsweise
+- In der Windows-VM: zuerst `docs/VM-AGENT.md` lesen (Einrichtung, `--selftest`, `--e2e`, Bericht unter `%APPDATA%\KeyTrainer\e2e`).
+- `exercises.json` ist die Quelle des Katalogs und wird direkt bearbeitet; `auto` = Tastenfolge nur für den automatischen Test.
 - Immer nur die aktuelle Phase aus PLAN.md umsetzen.
 - Nach jeder Phase: `dotnet build` und `dotnet test`, Ergebnis zusammenfassen, manuelle Testliste ausgeben, auf Freigabe warten.
 - Eingabeerfassung und Overlay sind nicht automatisch testbar: immer manuelle Testschritte nennen.

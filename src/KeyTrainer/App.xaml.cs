@@ -34,6 +34,13 @@ public partial class App : Application
             Shutdown(SelfTest.Run());
             return;
         }
+        if (e.Args.Contains("--e2e"))
+        {
+            // The test window closes before the report is written; shut down explicitly afterwards.
+            ShutdownMode = ShutdownMode.OnExplicitShutdown;
+            RunE2E(e.Args);
+            return;
+        }
 
         var updatedFrom = Array.IndexOf(e.Args, "--updated-from");
         if (updatedFrom >= 0 && updatedFrom + 1 < e.Args.Length)
@@ -41,6 +48,12 @@ public partial class App : Application
         _ = Updater.CleanupAsync();
 
         new MainWindow().Show();
+    }
+
+    async void RunE2E(string[] args)
+    {
+        int code = await E2E.E2ERunner.RunAsync(args);
+        Shutdown(code);
     }
 
     /// <summary>Loads the exercise catalog embedded in the exe.</summary>

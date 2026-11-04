@@ -119,6 +119,22 @@ public static class ExerciseCatalog
             ValidateWindow(where, verify, errors, requireAny: false);
         }
         if (task.Context is not null && task.Mode != ExerciseMode.Keys) errors.Add($"{where}: context nur bei mode keys");
+        foreach (var action in task.Auto)
+        {
+            if (action.StartsWith("wait:", StringComparison.Ordinal))
+            {
+                if (!int.TryParse(action[5..], out var ms) || ms is < 0 or > 30_000) errors.Add($"{where}: auto \"{action}\" ungültig");
+            }
+            else if (!action.StartsWith(Input.InputToken.TextPrefix, StringComparison.Ordinal))
+            {
+                try { Input.Combo.Parse(action); }
+                catch (FormatException fe) { errors.Add($"{where}: auto: {fe.Message}"); }
+            }
+            else if (action.Contains('*'))
+            {
+                errors.Add($"{where}: auto \"{action}\" enthält \"*\" – konkreten Text angeben");
+            }
+        }
         // Shown to the user; "*" is a pattern character, the solution needs a concrete example.
         if (task.Solution.Contains('*')) errors.Add($"{where}: solution enthält \"*\" – konkretes Beispiel angeben");
 

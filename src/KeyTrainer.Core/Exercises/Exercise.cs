@@ -51,6 +51,12 @@ public class TaskDefinition
 
     /// <summary>Explanations for typical mix-ups, keyed by combo ("Strg+T").</summary>
     public Dictionary<string, string> ExplainWrong { get; init; } = [];
+
+    /// <summary>
+    /// For the automatic end-to-end test only: what to press to solve this step ("Win+R", "text:services.msc",
+    /// "Enter", "wait:800"). Empty = the test cannot run this step on its own.
+    /// </summary>
+    public List<string> Auto { get; init; } = [];
 }
 
 public sealed class Exercise : TaskDefinition
@@ -66,6 +72,9 @@ public sealed class Exercise : TaskDefinition
 
     /// <summary>Shortcut or window title not yet confirmed on a real German Windows 11.</summary>
     public bool Unverified { get; init; }
+
+    /// <summary>The end-to-end test must not run it (e.g. it would cut the network).</summary>
+    public bool NoAuto { get; init; }
 
     /// <summary>Id of an entry in <see cref="ExerciseFile.Software"/>.</summary>
     public string? Requires { get; init; }

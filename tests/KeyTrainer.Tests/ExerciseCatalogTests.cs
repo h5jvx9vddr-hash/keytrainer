@@ -74,6 +74,30 @@ public class ExerciseCatalogTests
     }
 
     [Fact]
+    public void ShippedCatalog_AutoActionsAreSendable()
+    {
+        var file = ExerciseCatalog.Load(CatalogPath);
+        var actions = file.Exercises.SelectMany(e => e.AllSteps).SelectMany(s => s.Auto)
+            .Where(a => !a.StartsWith("wait:") && !a.StartsWith("text:"));
+        foreach (var action in actions)
+        {
+            var combo = Combo.Parse(action);
+            Assert.True(combo.Key.Length == 0 || KeyNames.VkOf(combo.Key) is not null, $"Taste in \"{action}\" nicht sendbar");
+        }
+    }
+
+    [Fact]
+    public void ShippedCatalog_CoreStepsHaveAutoActions()
+    {
+        // Steps the end-to-end test cannot play on its own must stay rare.
+        var file = ExerciseCatalog.Load(CatalogPath);
+        var missing = file.Exercises.Where(e => !e.NoAuto && !e.Elevated)
+            .SelectMany(e => e.AllSteps.Select((s, i) => (e.Id, i, s)))
+            .Where(x => x.s.Auto.Count == 0).Select(x => $"{x.Id}#{x.i}").ToList();
+        Assert.True(missing.Count <= 3, string.Join(", ", missing));
+    }
+
+    [Fact]
     public void UnknownMode_IsJsonError()
     {
         var ex = Assert.Throws<CatalogException>(() => ExerciseCatalog.Parse("""{ "exercises": [ { "mode": "magic" } ] }"""));

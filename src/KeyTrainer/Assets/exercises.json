@@ -6,6 +6,7 @@
     "expect.sequence: 'Strg+Shift+T' oder 'text:…' (Groß/Klein egal, '*' = beliebig). solution: immer konkretes Beispiel, nie '*'.",
     "hints: Tipps in steigender Deutlichkeit; danach zeigt der Trainer 'Schnellster Weg: <solution>'.",
     "extraCategories: nicht im Standard-Training. software: was manche Übungen brauchen und wie man es installiert.",
+    "auto: nur für den automatischen Test (--e2e): Tasten, die den Schritt lösen ('wait:ms' = warten). noAuto: Test darf die Aufgabe nicht ausführen.",
     "Fenstertitel gelten für ein deutsches Windows 11."
   ],
   "version": 2,
@@ -146,7 +147,11 @@
       "verify": {
         "process": "explorer.exe",
         "windowClass": "CabinetWClass"
-      }
+      },
+      "auto": [
+        "Win+E",
+        "wait:1800"
+      ]
     },
     {
       "id": "start-rechner",
@@ -160,7 +165,15 @@
       "mode": "result",
       "verify": {
         "process": "CalculatorApp.exe"
-      }
+      },
+      "auto": [
+        "Win",
+        "wait:1200",
+        "text:rechner",
+        "wait:1200",
+        "Enter",
+        "wait:2500"
+      ]
     },
     {
       "id": "start-editor",
@@ -174,7 +187,15 @@
       "mode": "result",
       "verify": {
         "process": "Notepad.exe"
-      }
+      },
+      "auto": [
+        "Win",
+        "wait:1200",
+        "text:editor",
+        "wait:1200",
+        "Enter",
+        "wait:2500"
+      ]
     },
     {
       "id": "start-einstellungen",
@@ -188,7 +209,11 @@
       "mode": "result",
       "verify": {
         "process": "SystemSettings.exe"
-      }
+      },
+      "auto": [
+        "Win+I",
+        "wait:3000"
+      ]
     },
     {
       "id": "start-taskmanager",
@@ -205,7 +230,11 @@
       },
       "explainWrong": {
         "Strg+Alt+Entf": "Geht auch, aber über den Sicherheitsbildschirm – Strg + Shift + Esc ist direkt."
-      }
+      },
+      "auto": [
+        "Strg+Shift+Esc",
+        "wait:2500"
+      ]
     },
     {
       "id": "start-browser",
@@ -220,7 +249,16 @@
       "mode": "result",
       "verify": {
         "process": "msedge.exe|chrome.exe|firefox.exe|brave.exe"
-      }
+      },
+      "auto": [
+        "Win",
+        "wait:1200",
+        "text:edge",
+        "wait:1200",
+        "Enter",
+        "wait:2500",
+        "wait:3000"
+      ]
     },
     {
       "id": "start-ausfuehren",
@@ -235,7 +273,11 @@
       "verify": {
         "windowClass": "#32770",
         "titleRegex": "^Ausführen$"
-      }
+      },
+      "auto": [
+        "Win+R",
+        "wait:1000"
+      ]
     },
     {
       "id": "start-terminal",
@@ -249,7 +291,13 @@
       "mode": "result",
       "verify": {
         "process": "WindowsTerminal.exe"
-      }
+      },
+      "auto": [
+        "Win+X",
+        "wait:800",
+        "text:i",
+        "wait:3000"
+      ]
     },
     {
       "id": "start-suche",
@@ -263,7 +311,15 @@
       "mode": "result",
       "verify": {
         "process": "Notepad.exe"
-      }
+      },
+      "auto": [
+        "Win+S",
+        "wait:1200",
+        "text:editor",
+        "wait:1200",
+        "Enter",
+        "wait:2500"
+      ]
     },
     {
       "id": "start-schliessen",
@@ -285,7 +341,15 @@
           "mode": "result",
           "verify": {
             "process": "Notepad.exe"
-          }
+          },
+          "auto": [
+            "Win",
+            "wait:1200",
+            "text:editor",
+            "wait:1200",
+            "Enter",
+            "wait:2500"
+          ]
         },
         {
           "prompt": "Schließe den Editor wieder",
@@ -297,7 +361,11 @@
           "mode": "result",
           "verify": {
             "processGone": "Notepad.exe"
-          }
+          },
+          "auto": [
+            "Alt+F4",
+            "wait:1500"
+          ]
         }
       ]
     },
@@ -313,7 +381,8 @@
       "mode": "result",
       "verify": {
         "sessionLock": true
-      }
+      },
+      "noAuto": true
     },
     {
       "id": "start-taskleiste",
@@ -324,6 +393,9 @@
         "Windows-Taste plus die Nummer des Platzes"
       ],
       "solution": "Win + 1",
+      "auto": [
+        "Win+1"
+      ],
       "mode": "keys",
       "expect": {
         "sequence": [
@@ -351,7 +423,15 @@
           "mode": "result",
           "verify": {
             "process": "Notepad.exe"
-          }
+          },
+          "auto": [
+            "Win",
+            "wait:1200",
+            "text:editor",
+            "wait:1200",
+            "Enter",
+            "wait:2500"
+          ]
         },
         {
           "prompt": "Öffne den Task-Manager",
@@ -362,7 +442,11 @@
           "mode": "result",
           "verify": {
             "process": "Taskmgr.exe"
-          }
+          },
+          "auto": [
+            "Strg+Shift+Esc",
+            "wait:2500"
+          ]
         },
         {
           "prompt": "Beende dort den Editor",
@@ -399,7 +483,15 @@
           "mode": "result",
           "verify": {
             "process": "Notepad.exe"
-          }
+          },
+          "auto": [
+            "Win",
+            "wait:1200",
+            "text:editor",
+            "wait:1200",
+            "Enter",
+            "wait:2500"
+          ]
         },
         {
           "prompt": "Öffne den Explorer",
@@ -411,7 +503,11 @@
           "verify": {
             "process": "explorer.exe",
             "windowClass": "CabinetWClass"
-          }
+          },
+          "auto": [
+            "Win+E",
+            "wait:1800"
+          ]
         },
         {
           "prompt": "Wechsle zurück zum Editor",
@@ -422,7 +518,11 @@
           "mode": "result",
           "verify": {
             "process": "Notepad.exe"
-          }
+          },
+          "auto": [
+            "Alt+Tab",
+            "wait:1000"
+          ]
         },
         {
           "prompt": "Und wieder zum Explorer",
@@ -434,7 +534,11 @@
           "verify": {
             "process": "explorer.exe",
             "windowClass": "CabinetWClass"
-          }
+          },
+          "auto": [
+            "Alt+Tab",
+            "wait:1000"
+          ]
         }
       ]
     },
@@ -459,7 +563,11 @@
           "verify": {
             "process": "explorer.exe",
             "windowClass": "CabinetWClass"
-          }
+          },
+          "auto": [
+            "Win+E",
+            "wait:1800"
+          ]
         },
         {
           "prompt": "Maximiere das Fenster",
@@ -472,7 +580,11 @@
             "process": "explorer.exe",
             "windowClass": "CabinetWClass",
             "windowState": "maximized"
-          }
+          },
+          "auto": [
+            "Win+Pfeil hoch",
+            "wait:1000"
+          ]
         }
       ]
     },
@@ -498,7 +610,15 @@
             "process": "explorer.exe",
             "windowClass": "CabinetWClass",
             "windowState": "leftHalf"
-          }
+          },
+          "auto": [
+            "Win+E",
+            "wait:1800",
+            "Win+Pfeil links",
+            "wait:1200",
+            "Esc",
+            "wait:500"
+          ]
         },
         {
           "prompt": "Öffne den Editor und docke ihn rechts an",
@@ -510,7 +630,19 @@
           "verify": {
             "process": "Notepad.exe",
             "windowState": "rightHalf"
-          }
+          },
+          "auto": [
+            "Win",
+            "wait:1200",
+            "text:editor",
+            "wait:1200",
+            "Enter",
+            "wait:2500",
+            "Win+Pfeil rechts",
+            "wait:1200",
+            "Esc",
+            "wait:500"
+          ]
         }
       ],
       "unverified": true
@@ -530,7 +662,11 @@
       },
       "explainWrong": {
         "Win+M": "Win + M minimiert auch alles – Win + D holt die Fenster mit demselben Kürzel zurück."
-      }
+      },
+      "auto": [
+        "Win+D",
+        "wait:1200"
+      ]
     },
     {
       "id": "fenster-monitor",
@@ -541,6 +677,9 @@
         "Wie Andocken, nur mit Shift zusätzlich"
       ],
       "solution": "Win + Shift + Pfeil rechts",
+      "auto": [
+        "Win+Shift+Pfeil rechts"
+      ],
       "mode": "keys",
       "expect": {
         "sequence": [
@@ -570,6 +709,9 @@
             "Win und Strg halten, dann D"
           ],
           "solution": "Win + Strg + D",
+          "auto": [
+            "Win+Strg+D"
+          ],
           "mode": "keys",
           "expect": {
             "sequence": [
@@ -583,6 +725,9 @@
             "Win und Strg halten, dann Pfeil"
           ],
           "solution": "Win + Strg + Pfeil links",
+          "auto": [
+            "Win+Strg+Pfeil links"
+          ],
           "mode": "keys",
           "expect": {
             "sequence": [
@@ -596,6 +741,12 @@
             "Wie Fenster schließen, nur mit Win + Strg"
           ],
           "solution": "Win + Strg + Pfeil rechts, Win + Strg + F4",
+          "auto": [
+            "Win+Strg+Pfeil rechts",
+            "wait:1000",
+            "Win+Strg+F4",
+            "wait:1000"
+          ],
           "mode": "keys",
           "expect": {
             "sequence": [
@@ -614,6 +765,11 @@
         "Windows-Taste plus Tab"
       ],
       "solution": "Win + Tab",
+      "auto": [
+        "Win+Tab",
+        "wait:1000",
+        "Esc"
+      ],
       "mode": "keys",
       "expect": {
         "sequence": [
@@ -636,7 +792,16 @@
         "process": "explorer.exe",
         "windowClass": "CabinetWClass",
         "titleRegex": "^Downloads"
-      }
+      },
+      "auto": [
+        "Win+E",
+        "wait:1800",
+        "Strg+L",
+        "wait:400",
+        "text:Downloads",
+        "Enter",
+        "wait:1800"
+      ]
     },
     {
       "id": "explorer-hoch",
@@ -660,7 +825,16 @@
             "process": "explorer.exe",
             "windowClass": "CabinetWClass",
             "titleRegex": "^Downloads"
-          }
+          },
+          "auto": [
+            "Win+E",
+            "wait:1800",
+            "Strg+L",
+            "wait:400",
+            "text:Downloads",
+            "Enter",
+            "wait:1800"
+          ]
         },
         {
           "prompt": "Gehe eine Ebene nach oben",
@@ -676,7 +850,11 @@
           },
           "explainWrong": {
             "Rücktaste": "Die Rücktaste geht im Verlauf zurück – Alt + Pfeil hoch geht immer eine Ebene nach oben."
-          }
+          },
+          "auto": [
+            "Alt+Pfeil hoch",
+            "wait:1500"
+          ]
         }
       ]
     },
@@ -702,7 +880,16 @@
             "process": "explorer.exe",
             "windowClass": "CabinetWClass",
             "titleRegex": "^Downloads"
-          }
+          },
+          "auto": [
+            "Win+E",
+            "wait:1800",
+            "Strg+L",
+            "wait:400",
+            "text:Downloads",
+            "Enter",
+            "wait:1800"
+          ]
         },
         {
           "prompt": "Lege den Ordner „KT-Test“ an",
@@ -714,7 +901,14 @@
           "mode": "result",
           "verify": {
             "pathExists": "%USERPROFILE%\\Downloads\\KT-Test"
-          }
+          },
+          "auto": [
+            "Strg+Shift+N",
+            "wait:1000",
+            "text:KT-Test",
+            "Enter",
+            "wait:1000"
+          ]
         },
         {
           "prompt": "Benenne ihn in „KT-Test2“ um",
@@ -726,7 +920,14 @@
           "verify": {
             "pathExists": "%USERPROFILE%\\Downloads\\KT-Test2",
             "pathMissing": "%USERPROFILE%\\Downloads\\KT-Test"
-          }
+          },
+          "auto": [
+            "F2",
+            "wait:600",
+            "text:KT-Test2",
+            "Enter",
+            "wait:1000"
+          ]
         },
         {
           "prompt": "Öffne seine Eigenschaften",
@@ -737,7 +938,11 @@
           "mode": "result",
           "verify": {
             "titleRegex": "Eigenschaften.*KT-Test2|KT-Test2.*Eigenschaften"
-          }
+          },
+          "auto": [
+            "Alt+Enter",
+            "wait:2000"
+          ]
         },
         {
           "prompt": "Schließe die Eigenschaften und lösche den Ordner",
@@ -749,7 +954,13 @@
           "mode": "result",
           "verify": {
             "pathMissing": "%USERPROFILE%\\Downloads\\KT-Test2"
-          }
+          },
+          "auto": [
+            "Esc",
+            "wait:800",
+            "Entf",
+            "wait:1500"
+          ]
         }
       ]
     },
@@ -774,7 +985,11 @@
           "verify": {
             "process": "explorer.exe",
             "windowClass": "CabinetWClass"
-          }
+          },
+          "auto": [
+            "Win+E",
+            "wait:1800"
+          ]
         },
         {
           "prompt": "Öffne einen neuen Tab",
@@ -782,6 +997,10 @@
             "Wie im Browser: Strg + T"
           ],
           "solution": "Strg + T",
+          "auto": [
+            "Strg+T",
+            "wait:1000"
+          ],
           "mode": "keys",
           "expect": {
             "sequence": [
@@ -801,7 +1020,14 @@
             "process": "explorer.exe",
             "windowClass": "CabinetWClass",
             "titleRegex": "^Downloads"
-          }
+          },
+          "auto": [
+            "Strg+L",
+            "wait:400",
+            "text:Downloads",
+            "Enter",
+            "wait:1800"
+          ]
         }
       ]
     },
@@ -826,7 +1052,11 @@
           "verify": {
             "process": "explorer.exe",
             "windowClass": "CabinetWClass"
-          }
+          },
+          "auto": [
+            "Win+E",
+            "wait:1800"
+          ]
         },
         {
           "prompt": "Springe ins Suchfeld und suche nach „txt“",
@@ -839,7 +1069,14 @@
             "process": "explorer.exe",
             "windowClass": "CabinetWClass",
             "titleRegex": "txt|Suchergebnisse"
-          }
+          },
+          "auto": [
+            "Strg+E",
+            "wait:500",
+            "text:txt",
+            "Enter",
+            "wait:2500"
+          ]
         }
       ]
     },
@@ -852,6 +1089,11 @@
         "Shift und eine Funktionstaste – oder die Menü-Taste"
       ],
       "solution": "Shift + F10",
+      "auto": [
+        "Shift+F10",
+        "wait:600",
+        "Esc"
+      ],
       "mode": "keys",
       "expect": {
         "sequence": [
@@ -885,7 +1127,15 @@
           "mode": "result",
           "verify": {
             "process": "Notepad.exe"
-          }
+          },
+          "auto": [
+            "Win",
+            "wait:1200",
+            "text:editor",
+            "wait:1200",
+            "Enter",
+            "wait:2500"
+          ]
         },
         {
           "prompt": "Tippe „Hallo schöne Welt“",
@@ -899,7 +1149,10 @@
               "text:*Welt*"
             ]
           },
-          "context": "editor"
+          "context": "editor",
+          "auto": [
+            "text:Hallo schöne Welt"
+          ]
         },
         {
           "prompt": "Springe ein Wort nach links",
@@ -907,6 +1160,9 @@
             "Strg macht Pfeiltasten wortweise"
           ],
           "solution": "Strg + Pfeil links",
+          "auto": [
+            "Strg+Pfeil links"
+          ],
           "mode": "keys",
           "expect": {
             "sequence": [
@@ -921,6 +1177,9 @@
             "Strg macht die Rücktaste wortweise"
           ],
           "solution": "Strg + Rücktaste",
+          "auto": [
+            "Strg+Rücktaste"
+          ],
           "mode": "keys",
           "expect": {
             "sequence": [
@@ -935,6 +1194,9 @@
             "Strg + Z"
           ],
           "solution": "Strg + Z",
+          "auto": [
+            "Strg+Z"
+          ],
           "mode": "keys",
           "expect": {
             "sequence": [
@@ -949,6 +1211,10 @@
             "A wie alles, C wie copy"
           ],
           "solution": "Strg + A, Strg + C",
+          "auto": [
+            "Strg+A",
+            "Strg+C"
+          ],
           "mode": "keys",
           "expect": {
             "sequence": [
@@ -964,6 +1230,10 @@
             "Strg + Ende springt ans Textende"
           ],
           "solution": "Strg + Ende, Strg + V",
+          "auto": [
+            "Strg+Ende",
+            "Strg+V"
+          ],
           "mode": "keys",
           "expect": {
             "sequence": [
@@ -998,7 +1268,16 @@
               "text:*"
             ]
           },
-          "context": "editor"
+          "context": "editor",
+          "auto": [
+            "Win",
+            "wait:1200",
+            "text:editor",
+            "wait:1200",
+            "Enter",
+            "wait:2500",
+            "text:Das ist ein Satz"
+          ]
         },
         {
           "prompt": "Springe an den Zeilenanfang",
@@ -1006,6 +1285,9 @@
             "Pos1"
           ],
           "solution": "Pos1",
+          "auto": [
+            "Pos1"
+          ],
           "mode": "keys",
           "expect": {
             "sequence": [
@@ -1020,6 +1302,9 @@
             "Shift markiert, Ende springt"
           ],
           "solution": "Shift + Ende",
+          "auto": [
+            "Shift+Ende"
+          ],
           "mode": "keys",
           "expect": {
             "sequence": [
@@ -1034,6 +1319,10 @@
             "Ende, dann Strg + Shift + Pfeil links"
           ],
           "solution": "Ende, Strg + Shift + Pfeil links",
+          "auto": [
+            "Ende",
+            "Strg+Shift+Pfeil links"
+          ],
           "mode": "keys",
           "expect": {
             "sequence": [
@@ -1053,6 +1342,11 @@
         "Wie Einfügen, nur mit der Windows-Taste"
       ],
       "solution": "Win + V",
+      "auto": [
+        "Win+V",
+        "wait:1000",
+        "Esc"
+      ],
       "mode": "keys",
       "expect": {
         "sequence": [
@@ -1069,6 +1363,11 @@
         "Windows-Taste, Shift und S wie Screenshot"
       ],
       "solution": "Win + Shift + S",
+      "auto": [
+        "Win+Shift+S",
+        "wait:1500",
+        "Esc"
+      ],
       "mode": "keys",
       "expect": {
         "sequence": [
@@ -1085,6 +1384,11 @@
         "Windows-Taste plus ein Satzzeichen"
       ],
       "solution": "Win + Punkt",
+      "auto": [
+        "Win+Punkt",
+        "wait:1200",
+        "Esc"
+      ],
       "mode": "keys",
       "expect": {
         "sequence": [
@@ -1112,7 +1416,16 @@
           "mode": "result",
           "verify": {
             "process": "msedge.exe|chrome.exe|firefox.exe|brave.exe"
-          }
+          },
+          "auto": [
+            "Win",
+            "wait:1200",
+            "text:edge",
+            "wait:1200",
+            "Enter",
+            "wait:2500",
+            "wait:3000"
+          ]
         },
         {
           "prompt": "Öffne einen neuen Tab mit wikipedia.de",
@@ -1124,7 +1437,14 @@
           "verify": {
             "process": "msedge.exe|chrome.exe|firefox.exe|brave.exe",
             "titleRegex": "Wikipedia"
-          }
+          },
+          "auto": [
+            "Strg+T",
+            "wait:800",
+            "text:wikipedia.de",
+            "Enter",
+            "wait:4000"
+          ]
         },
         {
           "prompt": "Wechsle zum anderen Tab",
@@ -1136,7 +1456,11 @@
           "verify": {
             "process": "msedge.exe|chrome.exe|firefox.exe|brave.exe",
             "titleChanged": true
-          }
+          },
+          "auto": [
+            "Strg+Tab",
+            "wait:1200"
+          ]
         },
         {
           "prompt": "Wechsle zurück zu Wikipedia und schließe den Tab",
@@ -1145,6 +1469,12 @@
             "Strg + W schließt den Tab"
           ],
           "solution": "Strg + Shift + Tab, Strg + W",
+          "auto": [
+            "Strg+Shift+Tab",
+            "wait:800",
+            "Strg+W",
+            "wait:800"
+          ],
           "mode": "keys",
           "expect": {
             "sequence": [
@@ -1163,7 +1493,11 @@
           "verify": {
             "process": "msedge.exe|chrome.exe|firefox.exe|brave.exe",
             "titleRegex": "Wikipedia"
-          }
+          },
+          "auto": [
+            "Strg+Shift+T",
+            "wait:3000"
+          ]
         }
       ]
     },
@@ -1187,7 +1521,16 @@
           "mode": "result",
           "verify": {
             "process": "msedge.exe|chrome.exe|firefox.exe|brave.exe"
-          }
+          },
+          "auto": [
+            "Win",
+            "wait:1200",
+            "text:edge",
+            "wait:1200",
+            "Enter",
+            "wait:2500",
+            "wait:3000"
+          ]
         },
         {
           "prompt": "Rufe bing.com auf",
@@ -1199,7 +1542,14 @@
           "verify": {
             "process": "msedge.exe|chrome.exe|firefox.exe|brave.exe",
             "titleRegex": "Bing"
-          }
+          },
+          "auto": [
+            "Strg+L",
+            "wait:400",
+            "text:bing.com",
+            "Enter",
+            "wait:4000"
+          ]
         }
       ]
     },
@@ -1224,7 +1574,21 @@
           "verify": {
             "process": "msedge.exe|chrome.exe|firefox.exe|brave.exe",
             "titleRegex": "Wikipedia"
-          }
+          },
+          "auto": [
+            "Win",
+            "wait:1200",
+            "text:edge",
+            "wait:1200",
+            "Enter",
+            "wait:2500",
+            "wait:3000",
+            "Strg+L",
+            "wait:400",
+            "text:wikipedia.de",
+            "Enter",
+            "wait:4000"
+          ]
         },
         {
           "prompt": "Rufe danach bing.com auf",
@@ -1236,7 +1600,14 @@
           "verify": {
             "process": "msedge.exe|chrome.exe|firefox.exe|brave.exe",
             "titleRegex": "Bing"
-          }
+          },
+          "auto": [
+            "Strg+L",
+            "wait:400",
+            "text:bing.com",
+            "Enter",
+            "wait:4000"
+          ]
         },
         {
           "prompt": "Gehe eine Seite zurück",
@@ -1248,7 +1619,11 @@
           "verify": {
             "process": "msedge.exe|chrome.exe|firefox.exe|brave.exe",
             "titleRegex": "Wikipedia"
-          }
+          },
+          "auto": [
+            "Alt+Pfeil links",
+            "wait:2500"
+          ]
         },
         {
           "prompt": "Und wieder vor",
@@ -1260,7 +1635,11 @@
           "verify": {
             "process": "msedge.exe|chrome.exe|firefox.exe|brave.exe",
             "titleRegex": "Bing"
-          }
+          },
+          "auto": [
+            "Alt+Pfeil rechts",
+            "wait:2500"
+          ]
         }
       ]
     },
@@ -1280,7 +1659,14 @@
           "text:*"
         ]
       },
-      "context": "browser"
+      "context": "browser",
+      "auto": [
+        "Strg+F",
+        "wait:500",
+        "text:Wikipedia",
+        "wait:300",
+        "Esc"
+      ]
     },
     {
       "id": "browser-neu-laden",
@@ -1291,6 +1677,9 @@
         "F5 lädt neu – mit Strg ohne Cache"
       ],
       "solution": "Strg + F5",
+      "auto": [
+        "Strg+F5"
+      ],
       "mode": "keys",
       "expect": {
         "sequence": [
@@ -1317,7 +1706,18 @@
       "verify": {
         "process": "msedge.exe|chrome.exe|firefox.exe|brave.exe",
         "titleRegex": "InPrivate|Inkognito|Privat"
-      }
+      },
+      "auto": [
+        "Win",
+        "wait:1200",
+        "text:edge",
+        "wait:1200",
+        "Enter",
+        "wait:2500",
+        "wait:3000",
+        "Strg+Shift+N",
+        "wait:2500"
+      ]
     },
     {
       "id": "browser-entwickler",
@@ -1328,6 +1728,9 @@
         "Eine Funktionstaste"
       ],
       "solution": "F12",
+      "auto": [
+        "F12"
+      ],
       "mode": "keys",
       "expect": {
         "sequence": [
@@ -1355,7 +1758,14 @@
       "verify": {
         "process": "mmc.exe",
         "titleRegex": "Dienste"
-      }
+      },
+      "auto": [
+        "Win+R",
+        "wait:800",
+        "text:services.msc",
+        "Enter",
+        "wait:3500"
+      ]
     },
     {
       "id": "tool-ereignisanzeige",
@@ -1371,7 +1781,14 @@
       "verify": {
         "process": "mmc.exe",
         "titleRegex": "Ereignisanzeige"
-      }
+      },
+      "auto": [
+        "Win+R",
+        "wait:800",
+        "text:eventvwr.msc",
+        "Enter",
+        "wait:3500"
+      ]
     },
     {
       "id": "tool-computerverwaltung",
@@ -1387,7 +1804,14 @@
       "verify": {
         "process": "mmc.exe",
         "titleRegex": "Computerverwaltung"
-      }
+      },
+      "auto": [
+        "Win+R",
+        "wait:800",
+        "text:compmgmt.msc",
+        "Enter",
+        "wait:3500"
+      ]
     },
     {
       "id": "tool-geraetemanager",
@@ -1403,7 +1827,14 @@
       "verify": {
         "process": "mmc.exe",
         "titleRegex": "Geräte-Manager"
-      }
+      },
+      "auto": [
+        "Win+R",
+        "wait:800",
+        "text:devmgmt.msc",
+        "Enter",
+        "wait:3500"
+      ]
     },
     {
       "id": "tool-datentraeger",
@@ -1420,7 +1851,14 @@
         "process": "mmc.exe",
         "titleRegex": "Datenträgerverwaltung"
       },
-      "elevated": true
+      "elevated": true,
+      "auto": [
+        "Win+R",
+        "wait:800",
+        "text:diskmgmt.msc",
+        "Enter",
+        "wait:3500"
+      ]
     },
     {
       "id": "tool-benutzer",
@@ -1437,7 +1875,14 @@
         "process": "mmc.exe",
         "titleRegex": "Lokale Benutzer|lusrmgr"
       },
-      "requires": "windows-pro"
+      "requires": "windows-pro",
+      "auto": [
+        "Win+R",
+        "wait:800",
+        "text:lusrmgr.msc",
+        "Enter",
+        "wait:3500"
+      ]
     },
     {
       "id": "tool-netzwerk",
@@ -1452,7 +1897,14 @@
       "mode": "result",
       "verify": {
         "titleRegex": "Netzwerkverbindungen"
-      }
+      },
+      "auto": [
+        "Win+R",
+        "wait:800",
+        "text:ncpa.cpl",
+        "Enter",
+        "wait:3500"
+      ]
     },
     {
       "id": "tool-programme",
@@ -1467,7 +1919,14 @@
       "mode": "result",
       "verify": {
         "titleRegex": "Programme und Features"
-      }
+      },
+      "auto": [
+        "Win+R",
+        "wait:800",
+        "text:appwiz.cpl",
+        "Enter",
+        "wait:3500"
+      ]
     },
     {
       "id": "tool-system",
@@ -1482,7 +1941,14 @@
       "mode": "result",
       "verify": {
         "titleRegex": "Systemeigenschaften"
-      }
+      },
+      "auto": [
+        "Win+R",
+        "wait:800",
+        "text:sysdm.cpl",
+        "Enter",
+        "wait:3500"
+      ]
     },
     {
       "id": "tool-msinfo",
@@ -1497,7 +1963,14 @@
       "mode": "result",
       "verify": {
         "process": "msinfo32.exe"
-      }
+      },
+      "auto": [
+        "Win+R",
+        "wait:800",
+        "text:msinfo32",
+        "Enter",
+        "wait:3500"
+      ]
     },
     {
       "id": "tool-rdp",
@@ -1512,7 +1985,14 @@
       "mode": "result",
       "verify": {
         "process": "mstsc.exe"
-      }
+      },
+      "auto": [
+        "Win+R",
+        "wait:800",
+        "text:mstsc",
+        "Enter",
+        "wait:3500"
+      ]
     },
     {
       "id": "tool-systemsteuerung",
@@ -1527,7 +2007,14 @@
       "mode": "result",
       "verify": {
         "titleRegex": "Systemsteuerung"
-      }
+      },
+      "auto": [
+        "Win+R",
+        "wait:800",
+        "text:control",
+        "Enter",
+        "wait:3500"
+      ]
     },
     {
       "id": "tool-aufgabenplanung",
@@ -1543,7 +2030,14 @@
       "verify": {
         "process": "mmc.exe",
         "titleRegex": "Aufgabenplanung"
-      }
+      },
+      "auto": [
+        "Win+R",
+        "wait:800",
+        "text:taskschd.msc",
+        "Enter",
+        "wait:3500"
+      ]
     },
     {
       "id": "tool-gpedit",
@@ -1561,7 +2055,14 @@
         "titleRegex": "Gruppenrichtlinien"
       },
       "requires": "windows-pro",
-      "elevated": true
+      "elevated": true,
+      "auto": [
+        "Win+R",
+        "wait:800",
+        "text:gpedit.msc",
+        "Enter",
+        "wait:3500"
+      ]
     },
     {
       "id": "tool-firewall",
@@ -1578,7 +2079,14 @@
         "process": "mmc.exe",
         "titleRegex": "Firewall"
       },
-      "elevated": true
+      "elevated": true,
+      "auto": [
+        "Win+R",
+        "wait:800",
+        "text:wf.msc",
+        "Enter",
+        "wait:3500"
+      ]
     },
     {
       "id": "tool-druckverwaltung",
@@ -1596,7 +2104,14 @@
         "titleRegex": "Druckverwaltung"
       },
       "requires": "print-management",
-      "elevated": true
+      "elevated": true,
+      "auto": [
+        "Win+R",
+        "wait:800",
+        "text:printmanagement.msc",
+        "Enter",
+        "wait:3500"
+      ]
     },
     {
       "id": "tool-zertifikate",
@@ -1612,7 +2127,14 @@
       "verify": {
         "process": "mmc.exe",
         "titleRegex": "Zertifikate|certmgr"
-      }
+      },
+      "auto": [
+        "Win+R",
+        "wait:800",
+        "text:certmgr.msc",
+        "Enter",
+        "wait:3500"
+      ]
     },
     {
       "id": "tool-ressourcen",
@@ -1627,7 +2149,14 @@
       "mode": "result",
       "verify": {
         "titleRegex": "Ressourcenmonitor"
-      }
+      },
+      "auto": [
+        "Win+R",
+        "wait:800",
+        "text:resmon",
+        "Enter",
+        "wait:3500"
+      ]
     },
     {
       "id": "tool-leistung",
@@ -1643,7 +2172,14 @@
       "verify": {
         "process": "mmc.exe",
         "titleRegex": "Leistungsüberwachung"
-      }
+      },
+      "auto": [
+        "Win+R",
+        "wait:800",
+        "text:perfmon",
+        "Enter",
+        "wait:3500"
+      ]
     },
     {
       "id": "tool-registry",
@@ -1659,7 +2195,14 @@
       "verify": {
         "process": "regedit.exe"
       },
-      "elevated": true
+      "elevated": true,
+      "auto": [
+        "Win+R",
+        "wait:800",
+        "text:regedit",
+        "Enter",
+        "wait:3500"
+      ]
     },
     {
       "id": "tool-energie",
@@ -1675,7 +2218,14 @@
       "verify": {
         "titleRegex": "Energieoptionen|Energie"
       },
-      "unverified": true
+      "unverified": true,
+      "auto": [
+        "Win+R",
+        "wait:800",
+        "text:powercfg.cpl",
+        "Enter",
+        "wait:3500"
+      ]
     },
     {
       "id": "tool-secpol",
@@ -1693,7 +2243,14 @@
         "titleRegex": "Sicherheitsrichtlinie"
       },
       "requires": "windows-pro",
-      "elevated": true
+      "elevated": true,
+      "auto": [
+        "Win+R",
+        "wait:800",
+        "text:secpol.msc",
+        "Enter",
+        "wait:3500"
+      ]
     },
     {
       "id": "tool-freigaben",
@@ -1709,7 +2266,14 @@
       "verify": {
         "process": "mmc.exe",
         "titleRegex": "Freigegebene Ordner"
-      }
+      },
+      "auto": [
+        "Win+R",
+        "wait:800",
+        "text:fsmgmt.msc",
+        "Enter",
+        "wait:3500"
+      ]
     },
     {
       "id": "tool-features",
@@ -1725,7 +2289,14 @@
       "verify": {
         "titleRegex": "Windows-Features"
       },
-      "elevated": true
+      "elevated": true,
+      "auto": [
+        "Win+R",
+        "wait:800",
+        "text:optionalfeatures",
+        "Enter",
+        "wait:3500"
+      ]
     },
     {
       "id": "tool-druckwarteschlange",
@@ -1748,7 +2319,14 @@
           "verify": {
             "process": "mmc.exe",
             "titleRegex": "Dienste"
-          }
+          },
+          "auto": [
+            "Win+R",
+            "wait:800",
+            "text:services.msc",
+            "Enter",
+            "wait:3500"
+          ]
         },
         {
           "prompt": "Springe zur Druckwarteschlange und öffne ihre Eigenschaften",
@@ -1760,7 +2338,15 @@
           "mode": "result",
           "verify": {
             "titleRegex": "Druckwarteschlange"
-          }
+          },
+          "auto": [
+            "Tab",
+            "wait:400",
+            "text:Druck",
+            "wait:800",
+            "Alt+Enter",
+            "wait:2000"
+          ]
         }
       ]
     },
@@ -1784,7 +2370,14 @@
           "mode": "result",
           "verify": {
             "titleRegex": "Netzwerkverbindungen"
-          }
+          },
+          "auto": [
+            "Win+R",
+            "wait:800",
+            "text:ncpa.cpl",
+            "Enter",
+            "wait:3500"
+          ]
         },
         {
           "prompt": "Öffne die Eigenschaften des Adapters",
@@ -1796,7 +2389,13 @@
           "mode": "result",
           "verify": {
             "titleRegex": "Eigenschaften von"
-          }
+          },
+          "auto": [
+            "Pfeil runter",
+            "wait:400",
+            "Alt+Enter",
+            "wait:2000"
+          ]
         }
       ]
     },
@@ -1847,6 +2446,11 @@
         "ipconfig mit einem Schalter für alles"
       ],
       "solution": "ipconfig /all, Enter",
+      "auto": [
+        "text:ipconfig /all",
+        "Enter",
+        "wait:1500"
+      ],
       "mode": "keys",
       "expect": {
         "sequence": [
@@ -1866,6 +2470,11 @@
         "ipconfig mit Schalter zum Leeren"
       ],
       "solution": "ipconfig /flushdns, Enter",
+      "auto": [
+        "text:ipconfig /flushdns",
+        "Enter",
+        "wait:1500"
+      ],
       "mode": "keys",
       "expect": {
         "sequence": [
@@ -1892,7 +2501,12 @@
           "Enter"
         ]
       },
-      "context": "terminal"
+      "context": "terminal",
+      "auto": [
+        "text:ping 8.8.8.8",
+        "Enter",
+        "wait:1500"
+      ]
     },
     {
       "id": "cmd-ping-dauer",
@@ -1912,7 +2526,13 @@
           "Strg+C"
         ]
       },
-      "context": "terminal"
+      "context": "terminal",
+      "auto": [
+        "text:ping -t 8.8.8.8",
+        "Enter",
+        "wait:1500",
+        "Strg+C"
+      ]
     },
     {
       "id": "cmd-tracert",
@@ -1931,7 +2551,12 @@
           "Enter"
         ]
       },
-      "context": "terminal"
+      "context": "terminal",
+      "auto": [
+        "text:tracert 8.8.8.8",
+        "Enter",
+        "wait:1500"
+      ]
     },
     {
       "id": "cmd-nslookup",
@@ -1950,7 +2575,12 @@
           "Enter"
         ]
       },
-      "context": "terminal"
+      "context": "terminal",
+      "auto": [
+        "text:nslookup wikipedia.de",
+        "Enter",
+        "wait:1500"
+      ]
     },
     {
       "id": "cmd-gpupdate",
@@ -1962,6 +2592,11 @@
         "group policy update"
       ],
       "solution": "gpupdate /force, Enter",
+      "auto": [
+        "text:gpupdate /force",
+        "Enter",
+        "wait:1500"
+      ],
       "mode": "keys",
       "expect": {
         "sequence": [
@@ -1981,6 +2616,11 @@
         "group policy result"
       ],
       "solution": "gpresult /r, Enter",
+      "auto": [
+        "text:gpresult /r",
+        "Enter",
+        "wait:1500"
+      ],
       "mode": "keys",
       "expect": {
         "sequence": [
@@ -2000,6 +2640,11 @@
         "Englisch: Wer bin ich?"
       ],
       "solution": "whoami, Enter",
+      "auto": [
+        "text:whoami",
+        "Enter",
+        "wait:1500"
+      ],
       "mode": "keys",
       "expect": {
         "sequence": [
@@ -2019,6 +2664,11 @@
         "whoami mit Schalter"
       ],
       "solution": "whoami /groups, Enter",
+      "auto": [
+        "text:whoami /groups",
+        "Enter",
+        "wait:1500"
+      ],
       "mode": "keys",
       "expect": {
         "sequence": [
@@ -2038,6 +2688,11 @@
         "netstat mit a, n, o"
       ],
       "solution": "netstat -ano, Enter",
+      "auto": [
+        "text:netstat -ano",
+        "Enter",
+        "wait:1500"
+      ],
       "mode": "keys",
       "expect": {
         "sequence": [
@@ -2057,6 +2712,11 @@
         "Englisch für Rechnername"
       ],
       "solution": "hostname, Enter",
+      "auto": [
+        "text:hostname",
+        "Enter",
+        "wait:1500"
+      ],
       "mode": "keys",
       "expect": {
         "sequence": [
@@ -2076,6 +2736,11 @@
         "ein Wort"
       ],
       "solution": "systeminfo, Enter",
+      "auto": [
+        "text:systeminfo",
+        "Enter",
+        "wait:1500"
+      ],
       "mode": "keys",
       "expect": {
         "sequence": [
@@ -2102,7 +2767,12 @@
           "Enter"
         ]
       },
-      "context": "powershell"
+      "context": "powershell",
+      "auto": [
+        "text:Get-Service Spooler",
+        "Enter",
+        "wait:1500"
+      ]
     },
     {
       "id": "ps-tnc",
@@ -2127,7 +2797,12 @@
           ]
         ]
       },
-      "context": "powershell"
+      "context": "powershell",
+      "auto": [
+        "text:Test-NetConnection server01 -Port 3389",
+        "Enter",
+        "wait:1500"
+      ]
     },
     {
       "id": "ps-gip",
@@ -2139,6 +2814,11 @@
         "Kurzform: gip"
       ],
       "solution": "Get-NetIPConfiguration, Enter",
+      "auto": [
+        "text:Get-NetIPConfiguration",
+        "Enter",
+        "wait:1500"
+      ],
       "mode": "keys",
       "expect": {
         "sequence": [
@@ -2182,6 +2862,10 @@
             "ipconfig mit Schalter zum Freigeben"
           ],
           "solution": "ipconfig /release, Enter",
+          "auto": [
+            "text:ipconfig /release",
+            "Enter"
+          ],
           "mode": "keys",
           "expect": {
             "sequence": [
@@ -2197,6 +2881,10 @@
             "ipconfig mit Schalter zum Erneuern"
           ],
           "solution": "ipconfig /renew, Enter",
+          "auto": [
+            "text:ipconfig /renew",
+            "Enter"
+          ],
           "mode": "keys",
           "expect": {
             "sequence": [
@@ -2212,6 +2900,10 @@
             "ipconfig mit Schalter für alles"
           ],
           "solution": "ipconfig /all, Enter",
+          "auto": [
+            "text:ipconfig /all",
+            "Enter"
+          ],
           "mode": "keys",
           "expect": {
             "sequence": [
@@ -2221,7 +2913,8 @@
           },
           "context": "terminal"
         }
-      ]
+      ],
+      "noAuto": true
     },
     {
       "id": "term-tab",
@@ -2232,6 +2925,9 @@
         "Wie im Browser, aber mit Shift"
       ],
       "solution": "Strg + Shift + T",
+      "auto": [
+        "Strg+Shift+T"
+      ],
       "mode": "keys",
       "expect": {
         "sequence": [
@@ -2249,6 +2945,9 @@
         "Alt + Shift und Plus oder Minus"
       ],
       "solution": "Alt + Shift + Plus",
+      "auto": [
+        "Alt+Shift+Plus"
+      ],
       "mode": "keys",
       "expect": {
         "sequence": [
@@ -2271,6 +2970,9 @@
         "D wie duplizieren"
       ],
       "solution": "Strg + Shift + D",
+      "auto": [
+        "Strg+Shift+D"
+      ],
       "mode": "keys",
       "expect": {
         "sequence": [
@@ -2288,6 +2990,9 @@
         "Strg + Shift und die Profilnummer"
       ],
       "solution": "Strg + Shift + 2",
+      "auto": [
+        "Strg+Shift+2"
+      ],
       "mode": "keys",
       "expect": {
         "sequence": [
@@ -2305,6 +3010,9 @@
         "W, mit Shift"
       ],
       "solution": "Strg + Shift + W",
+      "auto": [
+        "Strg+Shift+W"
+      ],
       "mode": "keys",
       "expect": {
         "sequence": [
@@ -2322,6 +3030,9 @@
         "F wie find, mit Shift"
       ],
       "solution": "Strg + Shift + F",
+      "auto": [
+        "Strg+Shift+F"
+      ],
       "mode": "keys",
       "expect": {
         "sequence": [
@@ -2339,6 +3050,9 @@
         "Eine Pfeiltaste"
       ],
       "solution": "Pfeil hoch",
+      "auto": [
+        "Pfeil hoch"
+      ],
       "mode": "keys",
       "expect": {
         "sequence": [
@@ -2356,6 +3070,9 @@
         "Eine Funktionstaste (nur cmd)"
       ],
       "solution": "F7",
+      "auto": [
+        "F7"
+      ],
       "mode": "keys",
       "expect": {
         "sequence": [
@@ -2373,6 +3090,9 @@
         "R wie reverse"
       ],
       "solution": "Strg + R",
+      "auto": [
+        "Strg+R"
+      ],
       "mode": "keys",
       "expect": {
         "sequence": [
@@ -2390,6 +3110,9 @@
         "Dasselbe wie Kopieren"
       ],
       "solution": "Strg + C",
+      "auto": [
+        "Strg+C"
+      ],
       "mode": "keys",
       "expect": {
         "sequence": [
@@ -2407,6 +3130,12 @@
         "Nicht ausschreiben"
       ],
       "solution": "„cd C:\\Win“ tippen, Tab, Enter",
+      "auto": [
+        "text:cd C:\\Win",
+        "Tab",
+        "wait:400",
+        "Enter"
+      ],
       "mode": "keys",
       "expect": {
         "sequence": [
@@ -2432,7 +3161,13 @@
           "Enter"
         ]
       },
-      "context": "terminal"
+      "context": "terminal",
+      "auto": [
+        "text:ssh admin@server01",
+        "Enter",
+        "wait:1000",
+        "Strg+C"
+      ]
     },
     {
       "id": "bash-suche",
@@ -2443,6 +3178,9 @@
         "R wie reverse"
       ],
       "solution": "Strg + R",
+      "auto": [
+        "Strg+R"
+      ],
       "mode": "keys",
       "expect": {
         "sequence": [
@@ -2460,6 +3198,9 @@
         "A wie Anfang"
       ],
       "solution": "Strg + A",
+      "auto": [
+        "Strg+A"
+      ],
       "mode": "keys",
       "expect": {
         "sequence": [
@@ -2477,6 +3218,9 @@
         "E wie end"
       ],
       "solution": "Strg + E",
+      "auto": [
+        "Strg+E"
+      ],
       "mode": "keys",
       "expect": {
         "sequence": [
@@ -2494,6 +3238,9 @@
         "L wie leeren"
       ],
       "solution": "Strg + L",
+      "auto": [
+        "Strg+L"
+      ],
       "mode": "keys",
       "expect": {
         "sequence": [
@@ -2511,6 +3258,9 @@
         "U"
       ],
       "solution": "Strg + U",
+      "auto": [
+        "Strg+U"
+      ],
       "mode": "keys",
       "expect": {
         "sequence": [
@@ -2528,6 +3278,9 @@
         "W wie Wort"
       ],
       "solution": "Strg + W",
+      "auto": [
+        "Strg+W"
+      ],
       "mode": "keys",
       "expect": {
         "sequence": [
@@ -2545,6 +3298,9 @@
         "D wie done"
       ],
       "solution": "Strg + D",
+      "auto": [
+        "Strg+D"
+      ],
       "mode": "keys",
       "expect": {
         "sequence": [
@@ -2562,6 +3318,10 @@
         "sudo und zwei Satzzeichen"
       ],
       "solution": "sudo !!, Enter",
+      "auto": [
+        "text:sudo !!",
+        "Enter"
+      ],
       "mode": "keys",
       "expect": {
         "sequence": [
@@ -2584,7 +3344,14 @@
       "mode": "result",
       "verify": {
         "process": "mstsc.exe"
-      }
+      },
+      "auto": [
+        "Win+R",
+        "wait:800",
+        "text:mstsc /v:server01",
+        "Enter",
+        "wait:3500"
+      ]
     },
     {
       "id": "rdp-cad",
@@ -2595,6 +3362,9 @@
         "In RDP ersetzt Ende das Entf"
       ],
       "solution": "Strg + Alt + Ende",
+      "auto": [
+        "Strg+Alt+Ende"
+      ],
       "mode": "keys",
       "expect": {
         "sequence": [
@@ -2613,6 +3383,9 @@
         "Strg + Alt + Pause (Laptop: Fn)"
       ],
       "solution": "Strg + Alt + Pause",
+      "auto": [
+        "Strg+Alt+Pause"
+      ],
       "mode": "keys",
       "expect": {
         "sequence": [
@@ -2631,6 +3404,9 @@
         "In RDP ersetzt Bild auf das Tab"
       ],
       "solution": "Alt + Bild auf",
+      "auto": [
+        "Alt+Bild auf"
+      ],
       "mode": "keys",
       "expect": {
         "sequence": [
@@ -2649,6 +3425,9 @@
         "VMware: Einfg statt Entf, Hyper-V: Ende"
       ],
       "solution": "Strg + Alt + Einfg",
+      "auto": [
+        "Strg+Alt+Einfg"
+      ],
       "mode": "keys",
       "expect": {
         "sequence": [
@@ -2672,6 +3451,9 @@
         "M wie Mail"
       ],
       "solution": "Strg + Shift + M",
+      "auto": [
+        "Strg+Shift+M"
+      ],
       "mode": "keys",
       "expect": {
         "sequence": [
@@ -2695,6 +3477,9 @@
         "Strg + Nummer"
       ],
       "solution": "Strg + 1",
+      "auto": [
+        "Strg+1"
+      ],
       "mode": "keys",
       "expect": {
         "sequence": [
@@ -2713,6 +3498,9 @@
         "Strg + Nummer"
       ],
       "solution": "Strg + 2",
+      "auto": [
+        "Strg+2"
+      ],
       "mode": "keys",
       "expect": {
         "sequence": [
@@ -2731,6 +3519,9 @@
         "R wie reply"
       ],
       "solution": "Strg + R",
+      "auto": [
+        "Strg+R"
+      ],
       "mode": "keys",
       "expect": {
         "sequence": [
@@ -2749,6 +3540,9 @@
         "Mit Shift"
       ],
       "solution": "Strg + Shift + R",
+      "auto": [
+        "Strg+Shift+R"
+      ],
       "mode": "keys",
       "expect": {
         "sequence": [
@@ -2767,6 +3561,9 @@
         "F wie forward"
       ],
       "solution": "Strg + F",
+      "auto": [
+        "Strg+F"
+      ],
       "mode": "keys",
       "expect": {
         "sequence": [
@@ -2786,6 +3583,9 @@
         "Strg + Enter"
       ],
       "solution": "Strg + Enter",
+      "auto": [
+        "Strg+Enter"
+      ],
       "mode": "keys",
       "expect": {
         "sequence": [
@@ -2809,6 +3609,9 @@
         "E"
       ],
       "solution": "Strg + E",
+      "auto": [
+        "Strg+E"
+      ],
       "mode": "keys",
       "expect": {
         "sequence": [
@@ -2827,6 +3630,9 @@
         "M wie Mikrofon"
       ],
       "solution": "Strg + Shift + M",
+      "auto": [
+        "Strg+Shift+M"
+      ],
       "mode": "keys",
       "expect": {
         "sequence": [
@@ -2845,6 +3651,9 @@
         "O wie Objektiv"
       ],
       "solution": "Strg + Shift + O",
+      "auto": [
+        "Strg+Shift+O"
+      ],
       "mode": "keys",
       "expect": {
         "sequence": [
@@ -2863,6 +3672,9 @@
         "H wie hang up"
       ],
       "solution": "Strg + Shift + H",
+      "auto": [
+        "Strg+Shift+H"
+      ],
       "mode": "keys",
       "expect": {
         "sequence": [
@@ -2881,6 +3693,9 @@
         "E"
       ],
       "solution": "Strg + E",
+      "auto": [
+        "Strg+E"
+      ],
       "mode": "keys",
       "expect": {
         "sequence": [
@@ -2900,6 +3715,9 @@
         "N wie neu"
       ],
       "solution": "Strg + N",
+      "auto": [
+        "Strg+N"
+      ],
       "mode": "keys",
       "expect": {
         "sequence": [
@@ -2925,7 +3743,14 @@
         "process": "mmc.exe",
         "titleRegex": "Active Directory-Benutzer"
       },
-      "requires": "rsat-ad"
+      "requires": "rsat-ad",
+      "auto": [
+        "Win+R",
+        "wait:800",
+        "text:dsa.msc",
+        "Enter",
+        "wait:3500"
+      ]
     },
     {
       "id": "srv-gpmc",
@@ -2942,7 +3767,14 @@
         "process": "mmc.exe",
         "titleRegex": "Gruppenrichtlinienverwaltung"
       },
-      "requires": "rsat-gpmc"
+      "requires": "rsat-gpmc",
+      "auto": [
+        "Win+R",
+        "wait:800",
+        "text:gpmc.msc",
+        "Enter",
+        "wait:3500"
+      ]
     },
     {
       "id": "srv-dns",
@@ -2959,7 +3791,14 @@
         "process": "mmc.exe",
         "titleRegex": "DNS"
       },
-      "requires": "rsat-dns"
+      "requires": "rsat-dns",
+      "auto": [
+        "Win+R",
+        "wait:800",
+        "text:dnsmgmt.msc",
+        "Enter",
+        "wait:3500"
+      ]
     },
     {
       "id": "srv-dhcp",
@@ -2976,7 +3815,14 @@
         "process": "mmc.exe",
         "titleRegex": "DHCP"
       },
-      "requires": "rsat-dhcp"
+      "requires": "rsat-dhcp",
+      "auto": [
+        "Win+R",
+        "wait:800",
+        "text:dhcpmgmt.msc",
+        "Enter",
+        "wait:3500"
+      ]
     },
     {
       "id": "srv-sites",
@@ -2993,7 +3839,14 @@
         "process": "mmc.exe",
         "titleRegex": "Standorte"
       },
-      "requires": "rsat-ad"
+      "requires": "rsat-ad",
+      "auto": [
+        "Win+R",
+        "wait:800",
+        "text:dssite.msc",
+        "Enter",
+        "wait:3500"
+      ]
     },
     {
       "id": "srv-manager",
@@ -3010,7 +3863,14 @@
         "process": "ServerManager.exe"
       },
       "requires": "rsat-servermanager",
-      "elevated": true
+      "elevated": true,
+      "auto": [
+        "Win+R",
+        "wait:800",
+        "text:servermanager",
+        "Enter",
+        "wait:3500"
+      ]
     },
     {
       "id": "srv-entsperren",
@@ -3033,7 +3893,14 @@
           "verify": {
             "process": "mmc.exe",
             "titleRegex": "Active Directory-Benutzer"
-          }
+          },
+          "auto": [
+            "Win+R",
+            "wait:800",
+            "text:dsa.msc",
+            "Enter",
+            "wait:3500"
+          ]
         },
         {
           "prompt": "Öffne die Eigenschaften eines Benutzers",

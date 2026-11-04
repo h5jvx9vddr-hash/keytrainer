@@ -99,6 +99,23 @@ public static class KeyNames
         return $"VK{vk:X2}";
     }
 
+    static readonly Dictionary<string, int> VkByName = BuildVkByName();
+
+    /// <summary>Virtual-key code for a canonical key name ("Enter", "F2", "R"), or null.</summary>
+    public static int? VkOf(string name) =>
+        Canonicalize(name) is { } canonical && VkByName.TryGetValue(canonical, out var vk) ? vk : null;
+
+    static Dictionary<string, int> BuildVkByName()
+    {
+        var map = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+        for (int vk = 1; vk < 0xFF; vk++)
+        {
+            var name = Name(vk);
+            if (!name.StartsWith("VK", StringComparison.Ordinal)) map.TryAdd(name, vk);
+        }
+        return map;
+    }
+
     /// <summary>Maps any accepted spelling to the canonical key name, or null if unknown.</summary>
     public static string? Canonicalize(string key)
     {

@@ -34,6 +34,25 @@ jobs:
           Get-Content "$env:APPDATA\KeyTrainer\logs\*.log" -ErrorAction SilentlyContinue
           if ($p.ExitCode -ne 0) { Write-Error "Self-test failed with exit code $($p.ExitCode)"; exit 1 }
 
+      # Plays the core exercises with real key presses on the runner's desktop. Informative only:
+      # the runner is an English Windows Server, so German window titles may not match here.
+      - name: End-to-end test (informativ)
+        continue-on-error: true
+        timeout-minutes: 25
+        shell: pwsh
+        run: |
+          $p = Start-Process -FilePath publish\KeyTrainer.exe -ArgumentList '--e2e' -Wait -PassThru
+          Get-Content "$env:APPDATA\KeyTrainer\e2e\report.md" -ErrorAction SilentlyContinue
+          Write-Host "E2E exit code $($p.ExitCode)"
+          Copy-Item "$env:APPDATA\KeyTrainer\e2e" e2e-report -Recurse -ErrorAction SilentlyContinue
+
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: e2e-report
+          path: e2e-report
+          if-no-files-found: ignore
+
       - name: Defender scan
         shell: pwsh
         run: |

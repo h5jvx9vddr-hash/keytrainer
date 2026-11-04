@@ -66,4 +66,4 @@ jobs:
         run: |
           gh release create "v$env:VERSION" publish/KeyTrainer.exe publish/KeyTrainer.exe.sha256 `
             --target $env:GITHUB_SHA --title "KeyTrainer $env:VERSION" `
-            --notes "Automatischer Build von $($env:GITHUB_SHA.Substring(0,7)). Update im Trainer über „Nach Updates suchen“."
+            --notes "Automatischer Build von $($env:GITHUB_SHA.Substring(0,7)). Update im Trainer über den Knopf Nach Updates suchen."

@@ -17,7 +17,7 @@ public partial class OverlayWindow : Window
 
     static readonly Brush CorrectBg = Frozen(0x1F, 0x6F, 0x3F);
     static readonly Brush WrongBg = Frozen(0x8A, 0x2A, 0x2A);
-    static readonly Brush ProgressBg = Frozen(0x2E, 0x4A, 0x7A);
+    static readonly Brush InfoBg = Frozen(0x33, 0x3A, 0x48);
     static readonly Brush ContextBg = Frozen(0x6A, 0x55, 0x1E);
 
     public OverlayWindow()
@@ -35,6 +35,7 @@ public partial class OverlayWindow : Window
         var detail = IsCollapsed ? Visibility.Collapsed : Visibility.Visible;
         MetaRow.Visibility = detail;
         LegendText.Visibility = detail;
+        HintRow.Margin = IsCollapsed ? new Thickness(0, 4, 0, 0) : new Thickness(0, 8, 0, 0);
         PromptText.FontSize = IsCollapsed ? 15 : 20;
         PromptText.Margin = IsCollapsed ? new Thickness(0) : new Thickness(0, 8, 0, 0);
         Card.Padding = IsCollapsed ? new Thickness(16, 8, 16, 8) : new Thickness(20, 14, 20, 14);
@@ -43,13 +44,19 @@ public partial class OverlayWindow : Window
     public void Render(TrainingSession session, bool paused)
     {
         var ex = session.Current;
-        if (ex is null) return;
+        var step = session.Step;
+        if (ex is null || step is null) return;
 
         CategoryText.Text = ex.Category;
-        MetaText.Text = $"Übung {session.Number}  ·  {(session.Mode == TrainingMode.Learn ? "Lernen" : "Quiz")}  ·  Stufe {ex.Level}"
-                        + (session.WrongAttempts > 0 ? $"  ·  {session.WrongAttempts} Fehlversuch{(session.WrongAttempts == 1 ? "" : "e")}" : "")
+        MetaText.Text = $"Aufgabe {session.Number}  ·  Stufe {ex.Level}"
+                        + (session.MouseUsed ? "  ·  Maus benutzt" : "  ·  ohne Maus")
                         + (ex.Unverified ? "  ·  ungeprüft" : "");
-        PromptText.Text = paused ? "Pausiert – Strg + Shift + F3 zum Fortsetzen" : ex.Prompt;
+        PromptText.Text = paused ? "Pausiert – Strg + Alt + Shift + P zum Fortsetzen" : ex.Prompt;
+
+        bool scenario = session.StepCount > 1;
+        StepRow.Visibility = !paused && scenario ? Visibility.Visible : Visibility.Collapsed;
+        StepBadge.Text = $"Schritt {session.StepIndex + 1}/{session.StepCount}";
+        StepText.Text = step.Prompt;
 
         var hint = session.HintText;
         HintRow.Visibility = !paused && hint is not null ? Visibility.Visible : Visibility.Collapsed;
@@ -65,10 +72,10 @@ public partial class OverlayWindow : Window
             FeedbackBox.Visibility = Visibility.Visible;
             FeedbackBox.Background = fb.Kind switch
             {
-                FeedbackKind.Correct => CorrectBg,
-                FeedbackKind.Wrong => WrongBg,
+                FeedbackKind.Correct or FeedbackKind.StepDone => CorrectBg,
+                FeedbackKind.Mouse or FeedbackKind.CorrectWithMouse => WrongBg,
                 FeedbackKind.WrongContext => ContextBg,
-                _ => ProgressBg,
+                _ => InfoBg,
             };
             FeedbackText.Text = fb.Message;
         }

@@ -15,8 +15,8 @@ internal enum TrainerCommand
 }
 
 /// <summary>
-/// The trainer's own global shortcuts (Strg + Shift + F1–F4) via RegisterHotKey, never via the hook.
-/// Not Strg + Alt: that is AltGr on German keyboards.
+/// The trainer's own global shortcuts (Strg + Alt + Shift + letter) via RegisterHotKey, never via the hook.
+/// No F keys: on laptops F1–F4 are media keys and need Fn. With Shift these don't collide with AltGr characters.
 /// </summary>
 internal sealed class TrainerHotkeys : IDisposable
 {
@@ -24,10 +24,10 @@ internal sealed class TrainerHotkeys : IDisposable
 
     public static readonly IReadOnlyDictionary<TrainerCommand, string> Combos = new Dictionary<TrainerCommand, string>
     {
-        [TrainerCommand.Hint] = "Strg+Shift+F1",
-        [TrainerCommand.Next] = "Strg+Shift+F2",
-        [TrainerCommand.Pause] = "Strg+Shift+F3",
-        [TrainerCommand.Collapse] = "Strg+Shift+F4",
+        [TrainerCommand.Hint] = "Strg+Alt+Shift+H",
+        [TrainerCommand.Next] = "Strg+Alt+Shift+N",
+        [TrainerCommand.Pause] = "Strg+Alt+Shift+P",
+        [TrainerCommand.Collapse] = "Strg+Alt+Shift+K",
     };
 
     /// <summary>Normal-form combos the training must ignore (the hook sees them too).</summary>
@@ -44,8 +44,8 @@ internal sealed class TrainerHotkeys : IDisposable
         _window.AddHook(WndProc);
         foreach (var command in Enum.GetValues<TrainerCommand>())
         {
-            uint vk = (uint)(Vk.F1 + (int)command - 1);
-            if (RegisterHotKey(_window.Handle, (int)command, MOD_CONTROL | MOD_SHIFT | MOD_NOREPEAT, vk))
+            uint vk = Combos[command][^1];
+            if (RegisterHotKey(_window.Handle, (int)command, MOD_CONTROL | MOD_ALT | MOD_SHIFT | MOD_NOREPEAT, vk))
                 _registered.Add((int)command);
             else
                 Log.Warn($"Trainer-Kürzel {Combos[command]} nicht registriert (belegt?), Win32-Fehler {Marshal.GetLastWin32Error()}");
@@ -58,7 +58,9 @@ internal sealed class TrainerHotkeys : IDisposable
         if (msg == WM_HOTKEY && Enum.IsDefined(typeof(TrainerCommand), wParam.ToInt32()))
         {
             handled = true;
-            Pressed?.Invoke((TrainerCommand)wParam.ToInt32());
+            var command = (TrainerCommand)wParam.ToInt32();
+            Log.Info($"Trainer-Kürzel: {command}");
+            Pressed?.Invoke(command);
         }
         return IntPtr.Zero;
     }

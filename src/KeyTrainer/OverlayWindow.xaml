@@ -30,8 +30,14 @@
                 </StackPanel>
             </DockPanel>
 
-            <!-- Task -->
+            <!-- Task: overall goal and, for scenarios, the current step -->
             <TextBlock x:Name="PromptText" Margin="0,8,0,0" FontSize="20" FontWeight="SemiBold" TextWrapping="Wrap" Text="Aufgabe" />
+            <StackPanel x:Name="StepRow" Orientation="Horizontal" Margin="0,6,0,0" Visibility="Collapsed">
+                <Border CornerRadius="4" Padding="7,1" Background="#33FFFFFF" VerticalAlignment="Center" Margin="0,0,8,0">
+                    <TextBlock x:Name="StepBadge" FontSize="12" FontWeight="SemiBold" />
+                </Border>
+                <TextBlock x:Name="StepText" FontSize="16" TextWrapping="Wrap" MaxWidth="600" VerticalAlignment="Center" />
+            </StackPanel>
 
             <!-- Hint -->
             <StackPanel x:Name="HintRow" Orientation="Horizontal" Margin="0,8,0,0" Visibility="Collapsed">
@@ -46,7 +52,7 @@
 
             <!-- Trainer shortcuts -->
             <TextBlock x:Name="LegendText" Margin="0,10,0,0" FontSize="11" Foreground="{StaticResource Muted}"
-                       Text="Strg + Shift + F1 Hinweis   ·   F2 Überspringen   ·   F3 Pause   ·   F4 Einklappen" />
+                       Text="Strg + Alt + Shift +   H Hinweis   ·   N Überspringen   ·   P Pause   ·   K Einklappen" />
         </StackPanel>
     </Border>
 </Window>

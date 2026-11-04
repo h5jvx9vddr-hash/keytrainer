@@ -4,9 +4,17 @@ using KeyTrainer.Core.Exercises;
 
 namespace KeyTrainer.Core.Windows;
 
+public enum WindowPlacement
+{
+    Normal,
+    Maximized,
+    LeftHalf,
+    RightHalf,
+}
+
 /// <summary>What the trainer knows about the foreground window.</summary>
 /// <param name="Process">Executable file name, e.g. "mmc.exe".</param>
-public sealed record WindowSnapshot(string Process, string WindowClass, string Title);
+public sealed record WindowSnapshot(string Process, string WindowClass, string Title, WindowPlacement Placement = WindowPlacement.Normal);
 
 public static class WindowMatcher
 {
@@ -15,10 +23,9 @@ public static class WindowMatcher
     /// <summary>True if every field set in <paramref name="match"/> fits the window.</summary>
     public static bool Matches(WindowMatch match, WindowSnapshot window)
     {
-        if (match.Process is { } process
-            && !process.Split('|').Any(p => string.Equals(p.Trim(), window.Process, StringComparison.OrdinalIgnoreCase)))
+        if (match.Process is { } process && !AnyOf(process, window.Process, StringComparison.OrdinalIgnoreCase))
             return false;
-        if (match.WindowClass is { } cls && !string.Equals(cls, window.WindowClass, StringComparison.Ordinal))
+        if (match.WindowClass is { } cls && !AnyOf(cls, window.WindowClass, StringComparison.Ordinal))
             return false;
         if (match.TitleRegex is { } pattern)
         {
@@ -27,4 +34,7 @@ public static class WindowMatcher
         }
         return true;
     }
+
+    static bool AnyOf(string alternatives, string value, StringComparison comparison) =>
+        alternatives.Split('|').Any(a => string.Equals(a.Trim(), value, comparison));
 }

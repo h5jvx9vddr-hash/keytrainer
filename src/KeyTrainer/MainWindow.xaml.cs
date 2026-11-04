@@ -17,25 +17,27 @@ using KeyTrainer.Updates;
 
 namespace KeyTrainer;
 
-/// <summary>Start screen: training setup, detection test, version and update.</summary>
+/// <summary>Start screen: one start button, optional areas, missing software, detection test, update.</summary>
 public partial class MainWindow : Window
 {
     const int MaxEntries = 200;
-    const string AllCategories = "Alle Bereiche";
 
     // Typed text is emitted after this much idle time (or earlier by a special key).
     static readonly TimeSpan TextIdle = TimeSpan.FromMilliseconds(1500);
 
-    // How long "Richtig" stays visible before the next exercise.
-    static readonly TimeSpan NextDelay = TimeSpan.FromMilliseconds(1600);
+    // How long "Geschafft" stays visible before the next exercise.
+    static readonly TimeSpan NextDelay = TimeSpan.FromMilliseconds(1800);
 
     readonly ComboDetector _detector = new();
-    readonly KeyboardSource _source;
+    readonly KeyboardSource _keyboard;
+    readonly MouseSource _mouse = new();
+    readonly WindowsWorld _world = new();
     readonly DispatcherTimer _textTimer;
-    readonly DispatcherTimer _tickTimer;
+    readonly DispatcherTimer _pollTimer;
     readonly DispatcherTimer _nextTimer;
     readonly ObservableCollection<TokenRow> _rows = [];
     readonly ExerciseFile? _catalog;
+    readonly Dictionary<string, CheckBox> _areaBoxes = [];
 
     bool _debugCapture;
     TrainingSession? _session;
@@ -59,8 +61,9 @@ public partial class MainWindow : Window
             _textTimer.Stop();
             _detector.Flush();
         };
-        _tickTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
-        _tickTimer.Tick += (_, _) => OnTick();
+        // Result checks, live context and the timer in the overlay.
+        _pollTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(300) };
+        _pollTimer.Tick += (_, _) => OnPoll();
         _nextTimer = new DispatcherTimer { Interval = NextDelay };
         _nextTimer.Tick += (_, _) =>
         {
@@ -69,12 +72,13 @@ public partial class MainWindow : Window
         };
 
         _detector.TokenDetected += OnToken;
-        _source = new KeyboardSource(_detector);
-        _source.KeyProcessed += () =>
+        _keyboard = new KeyboardSource(_detector);
+        _keyboard.KeyProcessed += () =>
         {
             _textTimer.Stop();
             if (_detector.HasPendingText) _textTimer.Start();
         };
+        _mouse.Used += OnMouseUsed;
 
         try
         {
@@ -87,33 +91,105 @@ public partial class MainWindow : Window
             PoolText.Text = "Übungskatalog fehlerhaft – siehe Log.";
             TrainButton.IsEnabled = false;
         }
-        if (_catalog is not null)
-        {
-            CategoryBox.Items.Add(AllCategories);
-            foreach (var category in _catalog.Exercises.Select(e => e.Category).Distinct())
-                CategoryBox.Items.Add(category);
-            CategoryBox.SelectedIndex = 0;
-        }
 
-        // Win+L locks the session before the key-ups arrive; forget stuck keys.
+        BuildAreas();
+        BuildSoftware();
         SystemEvents.SessionSwitch += OnSessionSwitch;
         UpdatePool();
         UpdateStatus();
+        Loaded += (_, _) => TrainButton.Focus();
     }
 
-    // ---------------------------------------------------------------- training
+    // ---------------------------------------------------------------- areas and software
+
+    void BuildAreas()
+    {
+        if (_catalog is null) return;
+        foreach (var group in _catalog.Exercises.GroupBy(e => e.Category))
+        {
+            bool extra = _catalog.ExtraCategories.Contains(group.Key);
+            var box = new CheckBox
+            {
+                Content = $"{group.Key} ({group.Count()})" + (extra ? " · Extra" : ""),
+                IsChecked = !extra,
+                Margin = new Thickness(0, 0, 18, 6),
+            };
+            box.Checked += (_, _) => UpdatePool();
+            box.Unchecked += (_, _) => UpdatePool();
+            _areaBoxes[group.Key] = box;
+            AreaPanel.Children.Add(box);
+        }
+    }
+
+    bool IsInstalled(Software sw) => sw.IsInstalled(p => File.Exists(p) || Directory.Exists(p));
+
+    void BuildSoftware()
+    {
+        SoftwarePanel.Children.Clear();
+        if (_catalog is null) return;
+        var missing = _catalog.Software.Where(kv => !IsInstalled(kv.Value)).ToList();
+        SoftwareExpander.Header = missing.Count == 0 ? "Fehlende Software – alles da" : $"Fehlende Software ({missing.Count})";
+
+        if (missing.Count == 0)
+        {
+            SoftwarePanel.Children.Add(new TextBlock { Text = "Alles installiert, was die Übungen brauchen.", Style = (Style)FindResource("Secondary") });
+            return;
+        }
+        foreach (var (id, sw) in missing)
+        {
+            int count = _catalog.Exercises.Count(e => e.Requires == id);
+            var row = new DockPanel { Margin = new Thickness(0, 0, 0, 10) };
+            if (sw.CanInstall)
+            {
+                var button = new Button { Content = SoftwareInstaller.ActionLabel(sw), Padding = new Thickness(12, 4, 12, 4), VerticalAlignment = VerticalAlignment.Center };
+                button.Click += async (_, _) => await InstallAsync(sw, button);
+                DockPanel.SetDock(button, Dock.Right);
+                row.Children.Add(button);
+            }
+            var text = new StackPanel { Margin = new Thickness(0, 0, 12, 0) };
+            text.Children.Add(new TextBlock { Text = sw.Name, FontWeight = FontWeights.SemiBold });
+            var detail = $"für {count} Aufgabe{(count == 1 ? "" : "n")}"
+                         + (sw.Capability is not null ? " · Windows-Feature, braucht Admin-Rechte" : "")
+                         + (sw.Note is not null ? " · " + sw.Note : "");
+            text.Children.Add(new TextBlock { Text = detail, TextWrapping = TextWrapping.Wrap, Style = (Style)FindResource("Secondary") });
+            row.Children.Add(text);
+            SoftwarePanel.Children.Add(row);
+        }
+    }
+
+    async Task InstallAsync(Software sw, Button button)
+    {
+        button.IsEnabled = false;
+        button.Content = "Läuft …";
+        try
+        {
+            bool ok = await SoftwareInstaller.InstallAsync(sw);
+            if (!ok) MessageBox.Show(this, $"{sw.Name} wurde nicht installiert. Details im Log.", "KeyTrainer", MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+        catch (InvalidOperationException ex)
+        {
+            ShowError(ex.Message);
+        }
+        BuildSoftware();
+        UpdatePool();
+    }
+
+    void OnRecheckSoftware(object sender, RoutedEventArgs e)
+    {
+        BuildSoftware();
+        UpdatePool();
+    }
 
     List<Exercise> SelectedExercises(out int missingSoftware)
     {
         missingSoftware = 0;
         if (_catalog is null) return [];
-        var category = CategoryBox.SelectedItem as string;
         var result = new List<Exercise>();
         foreach (var ex in _catalog.Exercises)
         {
-            if (category is not null && category != AllCategories && ex.Category != category) continue;
+            if (!_areaBoxes.TryGetValue(ex.Category, out var box) || box.IsChecked != true) continue;
             if (!TrainingSession.IsSupported(ex)) continue;
-            if (ex.Requires is { } req && !req.IsMet(File.Exists))
+            if (ex.Requires is { } id && _catalog.Software.TryGetValue(id, out var sw) && !IsInstalled(sw))
             {
                 missingSoftware++;
                 continue;
@@ -123,15 +199,18 @@ public partial class MainWindow : Window
         return result;
     }
 
-    void OnFilterChanged(object sender, SelectionChangedEventArgs e) => UpdatePool();
-
     void UpdatePool()
     {
         if (_catalog is null || PoolText is null) return;
         var list = SelectedExercises(out int missing);
-        PoolText.Text = $"{list.Count} Übungen" + (missing > 0 ? $" · {missing} brauchen Software, die hier fehlt" : "");
+        int areas = _areaBoxes.Values.Count(b => b.IsChecked == true);
+        PoolText.Text = $"{list.Count} Aufgaben aus {areas} Bereichen"
+                        + (missing > 0 ? $" · {missing} weitere brauchen Software (siehe unten)" : "")
+                        + " · Enter startet";
         if (_session is null) TrainButton.IsEnabled = list.Count > 0;
     }
+
+    // ---------------------------------------------------------------- training
 
     void OnTrain(object sender, RoutedEventArgs e)
     {
@@ -143,15 +222,14 @@ public partial class MainWindow : Window
     {
         var exercises = SelectedExercises(out _);
         if (_catalog is null || exercises.Count == 0) return;
-        var mode = ModeBox.SelectedIndex == 0 ? TrainingMode.Learn : TrainingMode.Quiz;
 
         try
         {
-            _session = new TrainingSession(exercises, mode, _catalog.Contexts);
+            _session = new TrainingSession(exercises, _catalog.Contexts, _world, ShowSolutionBox.IsChecked == true);
             _session.AttemptFinished += OnAttemptFinished;
             _hotkeys = new TrainerHotkeys();
             _hotkeys.Pressed += OnHotkey;
-            EnsureCapture();
+            StartCapture();
         }
         catch (Exception ex)
         {
@@ -161,13 +239,13 @@ public partial class MainWindow : Window
             return;
         }
 
-        Log.Info($"Training gestartet: {mode}, {exercises.Count} Übungen, Bereich {CategoryBox.SelectedItem}");
+        Log.Info($"Training gestartet: {exercises.Count} Aufgaben, Lösung sofort: {_session.ShowSolution}");
         _paused = false;
         _overlay = new OverlayWindow();
         _session.Next();
         _overlay.Render(_session, _paused);
         _overlay.Show();
-        _tickTimer.Start();
+        _pollTimer.Start();
         // Practise in the real programs, not in this window.
         WindowState = WindowState.Minimized;
         UpdateTrainingUi();
@@ -176,7 +254,7 @@ public partial class MainWindow : Window
     void StopTraining()
     {
         _nextTimer.Stop();
-        _tickTimer.Stop();
+        _pollTimer.Stop();
         _overlay?.Close();
         _overlay = null;
         _hotkeys?.Dispose();
@@ -184,22 +262,27 @@ public partial class MainWindow : Window
 
         if (_session is { } session)
         {
-            var solved = session.Attempts.Count(a => a.Solved);
-            var noHint = session.Attempts.Count(a => a.Solved && a.HintLevel == 0);
-            Log.Info($"Training beendet: {session.Attempts.Count} Übungen, {solved} gelöst, {noHint} ohne Hinweis");
-            SessionText.Text = $"Letztes Training: {solved} von {session.Attempts.Count} gelöst, {noHint} davon ohne Hinweis.";
-            SessionText.Visibility = Visibility.Visible;
+            var done = session.Attempts.Where(a => !a.Skipped).ToList();
+            int clean = done.Count(a => a.Solved);
+            int withMouse = done.Count(a => a.MouseUsed);
+            Log.Info($"Training beendet: {session.Attempts.Count} Aufgaben, {clean} ohne Maus geschafft, {withMouse} mit Maus, " +
+                     $"{session.Attempts.Count(a => a.Skipped)} übersprungen");
+            SessionText.Text = session.Attempts.Count == 0
+                ? ""
+                : $"Letztes Training: {clean} von {session.Attempts.Count} Aufgaben ohne Maus geschafft" +
+                  (withMouse > 0 ? $", {withMouse}× Maus benutzt." : ".");
+            SessionText.Visibility = session.Attempts.Count == 0 ? Visibility.Collapsed : Visibility.Visible;
         }
         _session = null;
-        ReleaseCapture();
+        StopCapture();
         UpdateTrainingUi();
         UpdatePool();
     }
 
     void OnAttemptFinished(AttemptRecord a) =>
         // Tracking: outcome only, never keys or typed text.
-        Log.Info($"Übung {a.ExerciseId}: {(a.Solved ? "gelöst" : "übersprungen")} nach {a.Duration.TotalSeconds:0.0} s, " +
-                 $"{a.WrongAttempts} Fehlversuche, Hinweisstufe {a.HintLevel}, Modus {a.Mode}");
+        Log.Info($"Aufgabe {a.ExerciseId}: {(a.Skipped ? "übersprungen" : a.Solved ? "geschafft" : "mit Maus")} nach " +
+                 $"{a.Duration.TotalSeconds:0.0} s, Schritte {a.StepsDone}/{a.StepCount}, Hinweisstufe {a.HintLevel}, Maus {a.MouseUsed}");
 
     void NextExercise()
     {
@@ -222,9 +305,9 @@ public partial class MainWindow : Window
                 break;
             case TrainerCommand.Pause:
                 _paused = !_paused;
-                // The hook runs only while an exercise is active.
-                if (_paused) ReleaseCapture();
-                else EnsureCapture();
+                // Input is observed only while an exercise is active.
+                if (_paused) StopCapture();
+                else StartCapture();
                 Log.Info(_paused ? "Training pausiert" : "Training fortgesetzt");
                 break;
             case TrainerCommand.Collapse:
@@ -235,11 +318,19 @@ public partial class MainWindow : Window
         UpdateStatus();
     }
 
-    void OnTick()
+    void OnPoll()
     {
         if (_session is null || _overlay is null || _paused) return;
-        if (_session.Tick()) _overlay.Render(_session, _paused);
+        bool wasSolved = _session.IsSolved;
+        if (_session.Poll()) _overlay.Render(_session, _paused);
         else _overlay.RenderTimer(_session);
+        if (!wasSolved && _session.IsSolved) _nextTimer.Start();
+    }
+
+    void OnMouseUsed()
+    {
+        if (_session is null || _overlay is null || _paused) return;
+        if (_session.OnMouse().Kind != FeedbackKind.None) _overlay.Render(_session, _paused);
     }
 
     void UpdateTrainingUi()
@@ -247,34 +338,36 @@ public partial class MainWindow : Window
         bool active = _session is not null;
         TrainLabel.Text = active ? "Training beenden" : "Training starten";
         TrainIcon.Text = active ? "" : "";
-        ModeBox.IsEnabled = CategoryBox.IsEnabled = !active;
+        ShowSolutionBox.IsEnabled = AreasExpander.IsEnabled = !active;
         UpdateStatus();
     }
 
     // ---------------------------------------------------------------- input
 
-    void EnsureCapture()
+    void StartCapture()
     {
-        if (!_source.IsRunning) _source.Start();
+        if (!_keyboard.IsRunning) _keyboard.Start();
+        if (_session is not null && !_paused) _mouse.Start();
     }
 
-    void ReleaseCapture()
+    void StopCapture()
     {
         bool trainingNeedsIt = _session is not null && !_paused;
-        if (!trainingNeedsIt && !_debugCapture && _source.IsRunning) _source.Stop();
+        if (!trainingNeedsIt) _mouse.Stop();
+        if (!trainingNeedsIt && !_debugCapture) _keyboard.Stop();
     }
 
     void OnToken(InputToken token)
     {
-        if (DebugArea.Visibility == Visibility.Visible) AddRow(token);
+        if (DebugExpander.IsExpanded) AddRow(token);
 
         if (_session is null || _overlay is null || _paused || _session.IsSolved) return;
         // The trainer's own shortcuts reach the hook as well.
         if (token.Kind == TokenKind.Combo && TrainerHotkeys.IgnoredTokens.Contains(token.Value)) return;
 
-        var feedback = _session.OnToken(token, ForegroundWindow.Snapshot());
+        _session.OnToken(token, ForegroundWindow.Snapshot());
         _overlay.Render(_session, _paused);
-        if (feedback.Kind == FeedbackKind.Correct) _nextTimer.Start();
+        if (_session.IsSolved) _nextTimer.Start();
     }
 
     void AddRow(InputToken token)
@@ -298,18 +391,22 @@ public partial class MainWindow : Window
     void OnSessionSwitch(object sender, SessionSwitchEventArgs e)
     {
         Log.Info($"Sitzungswechsel: {e.Reason}");
-        Dispatcher.InvokeAsync(_detector.Reset);
+        Dispatcher.InvokeAsync(() =>
+        {
+            if (e.Reason == SessionSwitchReason.SessionLock) _world.LastSessionLock = DateTime.Now;
+            // Win+L locks the session before the key-ups arrive; forget stuck keys.
+            _detector.Reset();
+        });
     }
 
     // ---------------------------------------------------------------- detection test
 
     void OnDebugExpanded(object sender, RoutedEventArgs e)
     {
-        DebugArea.Visibility = DebugExpander.IsExpanded ? Visibility.Visible : Visibility.Collapsed;
         if (!DebugExpander.IsExpanded && _debugCapture)
         {
             _debugCapture = false;
-            ReleaseCapture();
+            StopCapture();
         }
         UpdateStatus();
     }
@@ -319,8 +416,8 @@ public partial class MainWindow : Window
         try
         {
             _debugCapture = !_debugCapture;
-            if (_debugCapture) EnsureCapture();
-            else ReleaseCapture();
+            if (_debugCapture) StartCapture();
+            else StopCapture();
         }
         catch (InvalidOperationException ex)
         {
@@ -369,13 +466,15 @@ public partial class MainWindow : Window
 
             if (_session is not null) StopTraining();
             _debugCapture = false;
-            ReleaseCapture();
+            StopCapture();
             UpdateProgress.Value = 0;
             UpdateProgress.Visibility = Visibility.Visible;
             var progress = new Progress<double>(p =>
             {
                 UpdateProgress.Value = p;
-                UpdateText.Text = $"Lade Version {info.Version.ToString(3)} … {p:P0}";
+                UpdateText.Text = p < 1
+                    ? $"Lade Version {info.Version.ToString(3)} … {p:P0}"
+                    : "Prüfe den Download und starte neu …";
             });
             await Updater.InstallAsync(info, progress);
             Application.Current.Shutdown();
@@ -404,7 +503,7 @@ public partial class MainWindow : Window
 
     void UpdateStatus()
     {
-        bool running = _source.IsRunning;
+        bool running = _keyboard.IsRunning;
         StartLabel.Text = _debugCapture ? "Erfassung stoppen" : "Erfassung starten";
         StartIcon.Text = _debugCapture ? "" : "";
         StatusText.Text = running ? "Erfassung läuft" : "Erfassung aus";
@@ -428,7 +527,8 @@ public partial class MainWindow : Window
         if (_session is not null) StopTraining();
         SystemEvents.SessionSwitch -= OnSessionSwitch;
         _textTimer.Stop();
-        _source.Dispose();
+        _keyboard.Dispose();
+        _mouse.Dispose();
         base.OnClosing(e);
     }
 }

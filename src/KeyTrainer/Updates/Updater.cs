@@ -59,9 +59,12 @@ internal static class Updater
         }
 
         var expected = ReleaseInfo.ParseChecksum(await Http.GetStringAsync(info.ChecksumUrl, ct));
-        string actual;
-        await using (var file = File.OpenRead(NewPath))
-            actual = ReleaseInfo.Sha256Of(file);
+        // Hashing 140 MB takes a few seconds; off the UI thread so the window stays responsive.
+        var actual = await Task.Run(() =>
+        {
+            using var file = File.OpenRead(NewPath);
+            return ReleaseInfo.Sha256Of(file);
+        }, ct);
         if (actual != expected)
         {
             TryDelete(NewPath);

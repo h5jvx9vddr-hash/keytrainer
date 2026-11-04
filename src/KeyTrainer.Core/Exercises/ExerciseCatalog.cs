@@ -47,6 +47,14 @@ public static class ExerciseCatalog
         foreach (var (name, context) in file.Contexts)
             ValidateWindow($"context \"{name}\"", context, errors, requireAny: true);
 
+        foreach (var (id, sw) in file.Software)
+        {
+            if (string.IsNullOrWhiteSpace(sw.Name)) errors.Add($"software \"{id}\": name fehlt");
+            if (sw.AnyFile.Count == 0) errors.Add($"software \"{id}\": anyFile fehlt");
+            if (!sw.CanInstall && sw.Note is null) errors.Add($"software \"{id}\": weder Installationsweg noch note");
+            if (sw.Url is { } url && !url.StartsWith("https://", StringComparison.Ordinal)) errors.Add($"software \"{id}\": url muss https sein");
+        }
+
         var ids = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         foreach (var ex in file.Exercises)
         {
@@ -55,7 +63,7 @@ public static class ExerciseCatalog
             else if (!ids.Add(ex.Id)) errors.Add($"{where}: id doppelt");
             if (string.IsNullOrWhiteSpace(ex.Category)) errors.Add($"{where}: category fehlt");
             if (ex.Level is < 1 or > 3) errors.Add($"{where}: level muss 1–3 sein");
-            if (ex.Requires is { AnyFile.Count: 0 }) errors.Add($"{where}: requires.anyFile ist leer");
+            if (ex.Requires is { } req && !file.Software.ContainsKey(req)) errors.Add($"{where}: unbekannte Software \"{req}\"");
 
             if (ex.Mode == ExerciseMode.Scenario)
             {
@@ -73,6 +81,8 @@ public static class ExerciseCatalog
                 ValidateTask(where, ex, file, errors);
             }
         }
+        foreach (var extra in file.ExtraCategories.Where(c => file.Exercises.All(e => e.Category != c)))
+            errors.Add($"extraCategories: \"{extra}\" kommt in keiner Übung vor");
         return errors;
     }
 
@@ -82,11 +92,8 @@ public static class ExerciseCatalog
         if (string.IsNullOrWhiteSpace(task.Solution)) errors.Add($"{where}: solution fehlt");
         if (task.Hints.Count == 0 || task.Hints.Any(string.IsNullOrWhiteSpace)) errors.Add($"{where}: mindestens ein hint nötig");
 
-        bool needsKeys = task.Mode is ExerciseMode.Keys or ExerciseMode.KeysAndResult;
-        bool needsResult = task.Mode is ExerciseMode.KeysAndResult or ExerciseMode.Result;
-
-        if (needsKeys && (task.Expect is null || task.Expect.Sequence.Count == 0))
-            errors.Add($"{where}: mode {task.Mode} braucht expect.sequence");
+        if (task.Mode == ExerciseMode.Keys && (task.Expect is null || task.Expect.Sequence.Count == 0))
+            errors.Add($"{where}: mode keys braucht expect.sequence");
         if (task.Expect is not null)
         {
             foreach (var sequence in task.Expect.AllSequences)
@@ -100,15 +107,20 @@ public static class ExerciseCatalog
             }
         }
 
-        if (needsResult && task.Verify is null) errors.Add($"{where}: mode {task.Mode} braucht verify");
+        if (task.Mode == ExerciseMode.Result && task.Verify is null) errors.Add($"{where}: mode result braucht verify");
         if (task.Verify is { } verify)
         {
-            bool hasCheck = verify.PracticeTitle is not null || verify.SessionLock || verify.ProcessRestarted is not null
-                            || verify.Process is not null || verify.WindowClass is not null || verify.TitleRegex is not null;
+            bool hasCheck = verify.HasWindowCondition || verify.PracticeTitle is not null || verify.SessionLock
+                            || verify.ProcessRestarted is not null || verify.ProcessGone is not null
+                            || verify.PathExists is not null || verify.PathMissing is not null;
             if (!hasCheck) errors.Add($"{where}: verify ohne Prüfung");
-            if (verify.TimeoutMs is < 500 or > 120_000) errors.Add($"{where}: verify.timeoutMs muss 500–120000 sein");
+            if (verify.WindowState is { } state && !Enum.TryParse<Windows.WindowPlacement>(state, true, out _))
+                errors.Add($"{where}: verify.windowState \"{state}\" unbekannt");
             ValidateWindow(where, verify, errors, requireAny: false);
         }
+        if (task.Context is not null && task.Mode != ExerciseMode.Keys) errors.Add($"{where}: context nur bei mode keys");
+        // Shown to the user; "*" is a pattern character, the solution needs a concrete example.
+        if (task.Solution.Contains('*')) errors.Add($"{where}: solution enthält \"*\" – konkretes Beispiel angeben");
 
         if (task.Context is not null && !file.Contexts.ContainsKey(task.Context))
             errors.Add($"{where}: unbekannter context \"{task.Context}\"");

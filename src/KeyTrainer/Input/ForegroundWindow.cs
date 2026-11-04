@@ -21,7 +21,7 @@ internal static class ForegroundWindow
             var core = FindWindowEx(hwnd, IntPtr.Zero, "Windows.UI.Core.CoreWindow", null);
             if (core != IntPtr.Zero) owner = core;
         }
-        return new WindowSnapshot(ProcessNameOf(owner), cls, title);
+        return new WindowSnapshot(ProcessNameOf(owner), cls, title, WindowsWorld.PlacementOf(hwnd));
     }
 
     static string ClassOf(IntPtr hwnd)

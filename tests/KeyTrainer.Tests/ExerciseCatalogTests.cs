@@ -11,15 +11,17 @@ public class ExerciseCatalogTests
     public void ShippedCatalog_IsValid()
     {
         var file = ExerciseCatalog.Load(CatalogPath);
-        Assert.True(file.Exercises.Count >= 150, $"nur {file.Exercises.Count} Übungen");
+        Assert.True(file.Exercises.Count >= 120, $"nur {file.Exercises.Count} Übungen");
+        var core = file.Exercises.Count(e => !file.ExtraCategories.Contains(e.Category));
+        Assert.True(core >= 60, $"nur {core} Übungen im Kern-Training");
     }
 
     [Fact]
     public void ShippedCatalog_CoversAllCategories()
     {
         var categories = ExerciseCatalog.Load(CatalogPath).Exercises.Select(e => e.Category).ToHashSet();
-        string[] expected = ["Basis", "Fenster", "Text", "Explorer", "Admin", "Konsolen", "Server", "Kommandozeile",
-                             "Terminal", "Fernwartung", "Linux", "Büro", "Browser", "Szenario"];
+        string[] expected = ["Start & Programme", "Fenster", "Text", "Explorer", "Browser", "Windows-Werkzeuge",
+                             "Kommandozeile", "Terminal", "Linux", "Fernwartung", "Büro", "Server"];
         Assert.Empty(expected.Except(categories));
     }
 
@@ -28,7 +30,7 @@ public class ExerciseCatalogTests
     {
         // Strg+Alt+Entf cannot be observed (secure attention sequence), see PLAN.md.
         var tokens = ExerciseCatalog.Load(CatalogPath).Exercises
-            .SelectMany(e => e.Steps.Cast<TaskDefinition>().Prepend(e))
+            .SelectMany(e => e.AllSteps)
             .SelectMany(t => t.Expect?.AllSequences ?? [])
             .SelectMany(s => s);
         Assert.DoesNotContain(tokens, t => !t.StartsWith("text:") && Combo.Normalize(t) == "Strg+Alt+Entf");
@@ -40,11 +42,12 @@ public class ExerciseCatalogTests
         const string json = """
             {
               "contexts": { "x": { } },
+              "software": { "sw": { "name": "SW", "anyFile": ["a"] } },
               "exercises": [
                 { "id": "a", "category": "C", "prompt": "p", "hints": ["h"], "solution": "s", "mode": "keys",
                   "expect": { "sequence": ["Strg+Foo"] }, "context": "nope" },
-                { "id": "a", "category": "C", "prompt": "p", "hints": [], "solution": "s", "mode": "result",
-                  "verify": { "titleRegex": "(" } }
+                { "id": "a", "category": "C", "prompt": "p", "hints": [], "solution": "ping *", "mode": "result",
+                  "verify": { "titleRegex": "(", "windowState": "huge" }, "requires": "unknown" }
               ]
             }
             """;
@@ -55,6 +58,19 @@ public class ExerciseCatalogTests
         Assert.Contains(ex.Errors, e => e.Contains("id doppelt"));
         Assert.Contains(ex.Errors, e => e.Contains("hint"));
         Assert.Contains(ex.Errors, e => e.Contains("titleRegex ungültig"));
+        Assert.Contains(ex.Errors, e => e.Contains("windowState"));
+        Assert.Contains(ex.Errors, e => e.Contains("konkretes Beispiel"));
+        Assert.Contains(ex.Errors, e => e.Contains("unbekannte Software"));
+        Assert.Contains(ex.Errors, e => e.Contains("software \"sw\""));
+    }
+
+    [Fact]
+    public void ShippedCatalog_SoftwareIsReferencedAndInstallable()
+    {
+        var file = ExerciseCatalog.Load(CatalogPath);
+        var used = file.Exercises.Select(e => e.Requires).OfType<string>().ToHashSet();
+        Assert.Empty(file.Software.Keys.Except(used));
+        Assert.All(file.Software.Values, sw => Assert.True(sw.CanInstall || sw.Note is not null, sw.Name));
     }
 
     [Fact]

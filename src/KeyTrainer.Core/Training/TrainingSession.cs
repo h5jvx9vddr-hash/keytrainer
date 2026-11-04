@@ -4,21 +4,17 @@ using KeyTrainer.Core.Windows;
 
 namespace KeyTrainer.Core.Training;
 
-public enum TrainingMode
-{
-    /// <summary>Solution is shown right away; for new shortcuts.</summary>
-    Learn,
-    /// <summary>Only the task; hints come on request, after mistakes or after a while.</summary>
-    Quiz,
-}
-
 public enum FeedbackKind
 {
     None,
+    /// <summary>Neutral echo of what was pressed, or an explanation of a mix-up.</summary>
+    Info,
+    StepDone,
     Correct,
-    Progress,
-    Wrong,
+    /// <summary>Goal reached, but the mouse was used.</summary>
+    CorrectWithMouse,
     WrongContext,
+    Mouse,
 }
 
 public sealed record Feedback(FeedbackKind Kind, string Message)
@@ -28,23 +24,22 @@ public sealed record Feedback(FeedbackKind Kind, string Message)
 
 /// <summary>Outcome of one exercise; kept for statistics. Never contains typed text or keys.</summary>
 public sealed record AttemptRecord(
-    string ExerciseId, TrainingMode Mode, DateTime Started, TimeSpan Duration,
-    bool Solved, bool Skipped, int WrongAttempts, int HintLevel);
+    string ExerciseId, DateTime Started, TimeSpan Duration,
+    bool Solved, bool Skipped, bool MouseUsed, int HintLevel, int StepsDone, int StepCount);
 
 /// <summary>
-/// Runs exercises one after another and checks the token stream against the expected sequences.
-/// Platform-free: the caller supplies tokens, the foreground window and the clock.
+/// Runs exercises one after another. Result steps are checked against the PC state (any keyboard way counts);
+/// keys steps against the token stream, where unrelated keys are simply ignored. Using the mouse voids the exercise.
+/// Platform-free: the caller supplies tokens, mouse events, the clock and an <see cref="IWorld"/>.
 /// </summary>
 public sealed class TrainingSession
 {
-    /// <summary>Quiz: one more hint level per this much time without solving.</summary>
+    /// <summary>One more hint level per this much time without progress.</summary>
     public static readonly TimeSpan AutoHintInterval = TimeSpan.FromSeconds(20);
-
-    /// <summary>Quiz: one more hint level per this many wrong attempts.</summary>
-    public const int WrongAttemptsPerHint = 2;
 
     readonly List<Exercise> _pool;
     readonly IReadOnlyDictionary<string, WindowMatch> _contexts;
+    readonly IWorld _world;
     readonly Func<DateTime> _clock;
     readonly Random _random;
     readonly List<AttemptRecord> _attempts = [];
@@ -52,24 +47,34 @@ public sealed class TrainingSession
 
     List<List<ExpectToken>> _sequences = [];
     int[] _positions = [];
+    StepBaseline _baseline = new();
     DateTime _started;
     DateTime _lastHintAt;
+    bool _wasInContext = true;
 
     public TrainingSession(
-        IEnumerable<Exercise> exercises, TrainingMode mode, IReadOnlyDictionary<string, WindowMatch> contexts,
-        Func<DateTime>? clock = null, Random? random = null)
+        IEnumerable<Exercise> exercises, IReadOnlyDictionary<string, WindowMatch> contexts, IWorld world,
+        bool showSolution = false, Func<DateTime>? clock = null, Random? random = null)
     {
         _pool = exercises.Where(IsSupported).ToList();
         if (_pool.Count == 0) throw new ArgumentException("Keine passenden Übungen.", nameof(exercises));
-        Mode = mode;
         _contexts = contexts;
+        _world = world;
+        ShowSolution = showSolution;
         _clock = clock ?? (() => DateTime.Now);
         _random = random ?? new Random();
     }
 
-    public TrainingMode Mode { get; }
+    /// <summary>Learning mode: the fastest way is shown right away.</summary>
+    public bool ShowSolution { get; }
 
     public Exercise? Current { get; private set; }
+
+    public TaskDefinition? Step => Current?.AllSteps[StepIndex];
+
+    public int StepIndex { get; private set; }
+
+    public int StepCount => Current?.AllSteps.Count ?? 0;
 
     public int Number { get; private set; }
 
@@ -77,9 +82,9 @@ public sealed class TrainingSession
 
     public int HintLevel { get; private set; }
 
-    public int MaxHintLevel => Current is null ? 0 : Current.Hints.Count + 2;
+    public int MaxHintLevel => Step is null ? 0 : Step.Hints.Count + 1;
 
-    public int WrongAttempts { get; private set; }
+    public bool MouseUsed { get; private set; }
 
     public bool IsSolved { get; private set; }
 
@@ -89,18 +94,17 @@ public sealed class TrainingSession
 
     public TimeSpan Elapsed => Current is null ? TimeSpan.Zero : _clock() - _started;
 
-    /// <summary>Context the current exercise needs, or null.</summary>
+    /// <summary>Context the current keys step needs, or null.</summary>
     public WindowMatch? RequiredContext =>
-        Current?.Context is { } name && _contexts.TryGetValue(name, out var ctx) ? ctx : null;
+        Step is { Mode: ExerciseMode.Keys, Context: { } name } && _contexts.TryGetValue(name, out var ctx) ? ctx : null;
 
     /// <summary>Raised when an exercise finished (solved or skipped).</summary>
     public event Action<AttemptRecord>? AttemptFinished;
 
-    /// <summary>Exercises this phase can check: key-based ones (keysAndResult is checked by its keys only for now).</summary>
+    /// <summary>Practice-page exercises need the page from phase 5.</summary>
     public static bool IsSupported(Exercise e) =>
-        e.Mode is ExerciseMode.Keys or ExerciseMode.KeysAndResult && e.Expect is { Sequence.Count: > 0 };
+        e.AllSteps.Count > 0 && e.AllSteps.All(s => s.Verify?.PracticeTitle is null);
 
-    /// <summary>Moves to the next exercise. Unfinished current exercise is recorded as skipped.</summary>
     public void Next()
     {
         if (Current is not null && !IsSolved) Finish(solved: false, skipped: true);
@@ -108,18 +112,15 @@ public sealed class TrainingSession
 
         Current = _queue.Dequeue();
         Number++;
-        _sequences = Current.Expect!.AllSequences.Select(s => s.Select(ExpectToken.Parse).ToList()).ToList();
-        _positions = new int[_sequences.Count];
-        _started = _lastHintAt = _clock();
-        WrongAttempts = 0;
+        _started = _clock();
+        MouseUsed = false;
         IsSolved = false;
-        HintLevel = Mode == TrainingMode.Learn ? MaxHintLevel : 0;
-        LastFeedback = Feedback.None;
+        BeginStep(0);
     }
 
     public void ShowHint()
     {
-        if (Current is null || HintLevel >= MaxHintLevel) return;
+        if (Step is null || HintLevel >= MaxHintLevel) return;
         HintLevel++;
         _lastHintAt = _clock();
     }
@@ -129,77 +130,121 @@ public sealed class TrainingSession
     {
         get
         {
-            if (Current is null || HintLevel == 0) return null;
-            if (HintLevel <= Current.Hints.Count) return Current.Hints[HintLevel - 1];
-            if (HintLevel == Current.Hints.Count + 1) return "Beginnt mit: " + Display(_sequences[0][0]);
-            return "Lösung: " + Current.Solution;
+            if (Step is null || HintLevel == 0) return null;
+            return HintLevel <= Step.Hints.Count ? Step.Hints[HintLevel - 1] : "Schnellster Weg: " + Step.Solution;
         }
     }
 
-    /// <summary>Call about once per second; raises the hint level in quiz mode after a while.</summary>
-    public bool Tick()
+    /// <summary>Call a few times per second: checks result steps, live context and timed hints. True if anything changed.</summary>
+    public bool Poll()
     {
-        if (Current is null || IsSolved || Mode != TrainingMode.Quiz || HintLevel >= MaxHintLevel) return false;
-        if (_clock() - _lastHintAt < AutoHintInterval) return false;
-        ShowHint();
-        return true;
+        if (Step is not { } step || IsSolved) return false;
+        bool changed = false;
+
+        if (step.Mode == ExerciseMode.Result && step.Verify is { } verify && Verifier.IsMet(verify, _world, _baseline))
+            return CompleteStep();
+
+        if (RequiredContext is { } ctx)
+        {
+            bool inContext = _world.Foreground() is { } fg && WindowMatcher.Matches(ctx, fg);
+            if (inContext != _wasInContext)
+            {
+                _wasInContext = inContext;
+                LastFeedback = inContext
+                    ? new Feedback(FeedbackKind.Info, $"Gut – du bist in {ctx.Label}.")
+                    : new Feedback(FeedbackKind.WrongContext, $"Wechsle zuerst in {ctx.Label}.");
+                changed = true;
+            }
+        }
+
+        if (!ShowSolution && HintLevel < MaxHintLevel && _clock() - _lastHintAt >= AutoHintInterval)
+        {
+            ShowHint();
+            changed = true;
+        }
+        return changed;
     }
 
     public Feedback OnToken(InputToken token, WindowSnapshot? foreground)
     {
-        if (Current is null || IsSolved) return Feedback.None;
+        if (Step is not { } step || IsSolved) return Feedback.None;
 
-        if (RequiredContext is { } ctx && (foreground is null || !WindowMatcher.Matches(ctx, foreground)))
-            return LastFeedback = new Feedback(FeedbackKind.WrongContext, $"Wechsle zuerst in {ctx.Label ?? Current.Context}.");
-
-        bool advanced = false;
-        for (int i = 0; i < _sequences.Count; i++)
+        if (step.Mode == ExerciseMode.Keys)
         {
-            var seq = _sequences[i];
-            if (seq[_positions[i]].Matches(token))
+            if (RequiredContext is { } ctx && (foreground is null || !WindowMatcher.Matches(ctx, foreground)))
             {
-                _positions[i]++;
-                advanced = true;
+                _wasInContext = false;
+                return LastFeedback = new Feedback(FeedbackKind.WrongContext, $"Wechsle zuerst in {ctx.Label}.");
             }
-            else
-            {
-                // A wrong token restarts the sequence; it may itself be a fresh start.
-                _positions[i] = seq[0].Matches(token) ? 1 : 0;
-                advanced |= _positions[i] > 0;
-            }
+            _wasInContext = true;
 
-            if (_positions[i] == seq.Count)
+            for (int i = 0; i < _sequences.Count; i++)
             {
-                IsSolved = true;
-                var record = Finish(solved: true, skipped: false);
-                return LastFeedback = new Feedback(FeedbackKind.Correct, $"Richtig – {record.Duration.TotalSeconds:0.0} s");
+                // Unrelated keys are ignored; the expected ones only have to come in order.
+                if (_sequences[i][_positions[i]].Matches(token)) _positions[i]++;
+                if (_positions[i] == _sequences[i].Count) return CompleteStepFeedback();
             }
         }
 
-        if (advanced)
-        {
-            int best = _positions.Max();
-            int total = _sequences[Array.IndexOf(_positions, best)].Count;
-            return LastFeedback = new Feedback(FeedbackKind.Progress, $"Gut – Schritt {best} von {total}");
-        }
+        if (token.Kind == TokenKind.Combo
+            && step.ExplainWrong.FirstOrDefault(kv => Combo.Normalize(kv.Key) == token.Value) is { Value: { } why })
+            return LastFeedback = new Feedback(FeedbackKind.Info, why);
 
-        WrongAttempts++;
-        if (Mode == TrainingMode.Quiz && WrongAttempts % WrongAttemptsPerHint == 0) ShowHint();
-        return LastFeedback = new Feedback(FeedbackKind.Wrong, ExplainWrong(token));
+        // Typed text is not echoed (it can be anything), keys are.
+        var echo = token.Kind == TokenKind.Text ? "Text getippt" : "Gedrückt: " + token.Value.Replace("+", " + ");
+        if (LastFeedback.Kind is FeedbackKind.Mouse or FeedbackKind.WrongContext) return LastFeedback;
+        return LastFeedback = new Feedback(FeedbackKind.Info, echo);
     }
 
-    string ExplainWrong(InputToken token)
+    /// <summary>A mouse click or wheel turn happened during the exercise.</summary>
+    public Feedback OnMouse()
     {
-        if (token.Kind == TokenKind.Combo && Current!.ExplainWrong.FirstOrDefault(kv => Combo.Normalize(kv.Key) == token.Value) is { Value: { } why })
-            return why;
-        return token.Kind == TokenKind.Text
-            ? $"„{token.Value}“ passt nicht."
-            : $"{token.Value.Replace("+", " + ")} war nicht gesucht.";
+        if (Current is null || IsSolved || MouseUsed) return Feedback.None;
+        MouseUsed = true;
+        return LastFeedback = new Feedback(FeedbackKind.Mouse, "Maus benutzt – diese Aufgabe zählt nicht. Nur die Tastatur!");
+    }
+
+    Feedback CompleteStepFeedback()
+    {
+        CompleteStep();
+        return LastFeedback;
+    }
+
+    bool CompleteStep()
+    {
+        if (StepIndex + 1 < StepCount)
+        {
+            BeginStep(StepIndex + 1);
+            LastFeedback = new Feedback(FeedbackKind.StepDone, $"Schritt {StepIndex} geschafft – weiter mit Schritt {StepIndex + 1}.");
+            return true;
+        }
+
+        IsSolved = true;
+        var record = Finish(solved: true, skipped: false);
+        var seconds = $"{record.Duration.TotalSeconds:0.0} s";
+        LastFeedback = MouseUsed
+            ? new Feedback(FeedbackKind.CorrectWithMouse, $"Ziel erreicht ({seconds}) – aber mit Maus, zählt nicht.")
+            : new Feedback(FeedbackKind.Correct, $"Geschafft – {seconds}, nur mit Tastatur.");
+        return true;
+    }
+
+    void BeginStep(int index)
+    {
+        StepIndex = index;
+        var step = Current!.AllSteps[index];
+        _sequences = step.Expect?.AllSequences.Select(s => s.Select(ExpectToken.Parse).ToList()).ToList() ?? [];
+        _positions = new int[_sequences.Count];
+        _baseline = Verifier.Begin(step.Verify, _world, _clock());
+        _lastHintAt = _clock();
+        _wasInContext = true;
+        HintLevel = ShowSolution ? MaxHintLevel : 0;
+        LastFeedback = Feedback.None;
     }
 
     AttemptRecord Finish(bool solved, bool skipped)
     {
-        var record = new AttemptRecord(Current!.Id, Mode, _started, _clock() - _started, solved, skipped, WrongAttempts, HintLevel);
+        var record = new AttemptRecord(Current!.Id, _started, _clock() - _started, solved && !MouseUsed, skipped, MouseUsed,
+            HintLevel, solved ? StepCount : StepIndex, StepCount);
         _attempts.Add(record);
         AttemptFinished?.Invoke(record);
         return record;
@@ -211,12 +256,5 @@ public sealed class TrainingSession
         var order = _pool.OrderBy(e => e.Level).ThenBy(_ => _random.Next()).ToList();
         if (order.Count > 1 && order[0] == Current) (order[0], order[1]) = (order[1], order[0]);
         foreach (var e in order) _queue.Enqueue(e);
-    }
-
-    static string Display(ExpectToken token)
-    {
-        if (token.Kind == TokenKind.Combo) return token.Value.Replace("+", " + ");
-        var text = token.Value.Replace("*", "…");
-        return text.Length > 4 ? $"„{text[..3]}…“ tippen" : $"„{text}“ tippen";
     }
 }

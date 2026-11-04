@@ -34,9 +34,24 @@ internal static class SelfTest
             var foreground = ForegroundWindow.Snapshot();
             Log.Info($"Selbsttest: Vordergrundfenster gelesen ({(foreground is null ? "keins" : "Prozess " + foreground.Process)})");
 
-            var session = new TrainingSession(catalog.Exercises, TrainingMode.Quiz, catalog.Contexts);
-            for (int i = 0; i < session.PoolSize; i++) session.Next();
-            Log.Info($"Selbsttest: alle {session.PoolSize} trainierbaren Übungen einmal gestellt");
+            using (var mouse = new MouseSource())
+            {
+                mouse.Start();
+                if (!mouse.IsRunning) failures.Add("Maus-Hook nicht installiert");
+                mouse.Stop();
+                Log.Info("Selbsttest: Maus-Hook installiert und wieder entfernt");
+            }
+
+            // Every exercise once against the real PC state: verifiers must not throw on Windows.
+            var world = new WindowsWorld();
+            var session = new TrainingSession(catalog.Exercises, catalog.Contexts, world);
+            for (int i = 0; i < session.PoolSize; i++)
+            {
+                session.Next();
+                for (int s = 0; s < session.StepCount && session.Step is not null; s++) session.Poll();
+            }
+            Log.Info($"Selbsttest: alle {session.PoolSize} Aufgaben einmal gestellt und geprüft");
+            Log.Info($"Selbsttest: Startzeit spoolsv.exe lesbar: {world.ProcessStartTime("spoolsv.exe") is not null}");
 
             // Many calls, so buffer overruns in the ToUnicodeEx interop corrupt the heap and crash here, not on the user's PC.
             for (int i = 0; i < 2000; i++)

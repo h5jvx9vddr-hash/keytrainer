@@ -66,6 +66,8 @@ Start-Process publish\KeyTrainer.exe '--e2e --extras' -Wait                   # 
 
 ## Offene Punkte (Stand 04.11.2026)
 
+Letzter CI-Lauf auf englischem Windows Server 2025: 52 OK, 4 Fehler – davon 2 nur dort (kein Rechner auf Server, „ö“ auf US-Layout), `tool-druckwarteschlange` tippt „Druck“ (passt nur auf deutschem Windows), `tool-adapter` wurde danach korrigiert (Leertaste markiert). Auf dem deutschen Windows 11 der VM muss alles neu bewertet werden.
+
 - Alle Aufgaben mit `"unverified": true` im Katalog auf echtem deutschen Windows 11 bestätigen oder korrigieren.
 - `start-taskmanager-beenden` Schritt 3: Bedienweg im Task-Manager (Suche/Liste) klären und `auto` ergänzen.
 - Fenster nebeneinander (`fenster-links-rechts`): Snap-Assist-Verhalten prüfen.

@@ -1151,7 +1151,7 @@
           },
           "context": "editor",
           "auto": [
-            "text:Hallo schöne Welt"
+            "text:Hallo schoene Welt"
           ]
         },
         {
@@ -2382,16 +2382,19 @@
         {
           "prompt": "Öffne die Eigenschaften des Adapters",
           "hints": [
-            "Adapter mit Pfeiltasten wählen",
-            "Alt + Enter"
+            "Adapter mit den Pfeiltasten ansteuern",
+            "Zeigt er nur einen Rahmen, markiert die Leertaste ihn",
+            "Alt + Enter öffnet die Eigenschaften"
           ],
-          "solution": "Pfeiltasten, Alt + Enter",
+          "solution": "Pfeil runter, Leertaste, Alt + Enter",
           "mode": "result",
           "verify": {
             "titleRegex": "Eigenschaften von|Properties"
           },
           "auto": [
             "Pfeil runter",
+            "wait:400",
+            "Leertaste",
             "wait:400",
             "Alt+Enter",
             "wait:2000"

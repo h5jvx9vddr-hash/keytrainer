@@ -73,8 +73,9 @@ Start-Process publish\KeyTrainer.exe '--e2e --elevated' -Verb RunAs -Wait     # 
 
 Letzter Lauf auf deutschem Windows 11 25H2 (`--e2e --elevated`, ohne Admin-Rechte): 61 OK, 0 Fehler, 5 begründet übersprungen/teilweise.
 
-- `start-taskmanager-beenden` Schritt 3: Der Task-Manager erhöht sich immer selbst; Bedienweg im Lauf als Administrator klären (Listeneintrag heißt „Notepad.exe“, nicht „Editor“).
-- `tool-druckwarteschlange` Schritt 2: in einer nicht erhöhten Konsole bestätigt (zweimal Tab, „Druckw“), im Lauf als Administrator nachprüfen.
+- `start-taskmanager-beenden` Schritt 3: Als Administrator bestätigt sind `Strg+F`, „Notepad“ (die Liste zeigt nur noch diesen Eintrag) und viermal Tab bis zur Zeile „Notepad.exe“. Dass `Entf` den Task dort beendet, ist unbestätigt: Das `auto` läuft nur als Administrator. Danach `unverified` entfernen.
+- `tool-druckwarteschlange`: im Lauf als Administrator OK.
+- Maus-Prüfung am Testanfang: schlug in zwei Läufen ohne erkennbaren Grund fehl (Ursache offen), sonst OK.
 - Maus-Klicks in erhöhten Fenstern erkennt der Trainer nicht, und Tasten-Schritte (`mode: keys`) in erhöhten Fenstern können nicht gelingen. Ergebnis-Schritte funktionieren.
 - Übrige Aufgaben mit `"unverified": true` betreffen Extras (RDP, VM, Outlook, Teams, AD).
 - Der Test lässt die Einstellungen-App offen; harmlos.

@@ -414,7 +414,7 @@
       "hints": [
         "Erst Editor öffnen, dann Task-Manager"
       ],
-      "solution": "Editor öffnen, Strg + Shift + Esc, Editor wählen, Entf",
+      "solution": "Editor öffnen, Strg + Shift + Esc, Strg + F, „Notepad“ tippen, viermal Tab, Entf",
       "steps": [
         {
           "prompt": "Öffne den Editor",
@@ -453,14 +453,30 @@
         {
           "prompt": "Beende dort den Editor",
           "hints": [
-            "Mit Tab in die Prozessliste, mit Pfeiltasten zum Editor (Tippen springt zum Namen)",
-            "Entf beendet den markierten Task"
+            "Strg + F springt ins Suchfeld – dort heißt der Editor „Notepad“",
+            "Viermal Tab führt zur Zeile, Entf beendet den Task"
           ],
-          "solution": "Tab bis zur Liste, „Editor“ tippen, Entf",
+          "solution": "Strg + F, „Notepad“ tippen, viermal Tab, Entf",
           "mode": "result",
           "verify": {
             "windowClosed": "Notepad.exe"
-          }
+          },
+          "auto": [
+            "Strg+F",
+            "wait:600",
+            "text:Notepad",
+            "wait:1500",
+            "Tab",
+            "wait:300",
+            "Tab",
+            "wait:300",
+            "Tab",
+            "wait:300",
+            "Tab",
+            "wait:400",
+            "Entf",
+            "wait:2500"
+          ]
         }
       ],
       "unverified": true

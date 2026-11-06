@@ -111,7 +111,7 @@ public static class ExerciseCatalog
         if (task.Verify is { } verify)
         {
             bool hasCheck = verify.HasWindowCondition || verify.PracticeTitle is not null || verify.SessionLock
-                            || verify.ProcessRestarted is not null || verify.ProcessGone is not null
+                            || verify.ProcessRestarted is not null || verify.WindowClosed is not null
                             || verify.PathExists is not null || verify.PathMissing is not null;
             if (!hasCheck) errors.Add($"{where}: verify ohne Prüfung");
             if (verify.WindowState is { } state && !Enum.TryParse<Windows.WindowPlacement>(state, true, out _))

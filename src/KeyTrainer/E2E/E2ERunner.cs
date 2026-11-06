@@ -16,10 +16,11 @@ using static KeyTrainer.Native.NativeMethods;
 namespace KeyTrainer.E2E;
 
 /// <summary>
-/// "KeyTrainer.exe --e2e [id-präfix …] [--extras]": plays every exercise with real key presses (its <c>auto</c> actions)
+/// "KeyTrainer.exe --e2e [id-präfix …] [--extras] [--elevated]": plays every exercise with real key presses (its <c>auto</c> actions)
 /// and checks that the trainer recognises each step. Writes report.md plus a screenshot per failure to
 /// %APPDATA%\KeyTrainer\e2e. Exit code 0 = no failures. Hands off mouse and keyboard while it runs;
-/// Strg + Alt + Shift + Q aborts.
+/// Strg + Alt + Shift + Q aborts. Started without admin rights, steps inside elevated windows (MMC consoles, Task-Manager)
+/// cannot be played; --elevated also runs exercises whose target opens elevated.
 /// </summary>
 internal sealed class E2ERunner
 {
@@ -48,6 +49,7 @@ internal sealed class E2ERunner
     readonly ExerciseFile _catalog;
     readonly string[] _filters;
     readonly bool _extras;
+    readonly bool _elevated;
     readonly string _outDir;
     readonly WindowsWorld _world = new();
     readonly ComboDetector _detector = new();
@@ -57,18 +59,19 @@ internal sealed class E2ERunner
     TrainingSession? _session;
     bool _aborted;
 
-    E2ERunner(ExerciseFile catalog, string[] filters, bool extras)
+    E2ERunner(ExerciseFile catalog, string[] filters, bool extras, bool elevated)
     {
         _catalog = catalog;
         _filters = filters;
         _extras = extras;
+        _elevated = elevated;
         _outDir = Path.Combine(App.DataDirectory, "e2e");
     }
 
     public static async Task<int> RunAsync(string[] args)
     {
         var filters = args.Where(a => !a.StartsWith("--", StringComparison.Ordinal)).ToArray();
-        var runner = new E2ERunner(App.LoadCatalog(), filters, args.Contains("--extras"));
+        var runner = new E2ERunner(App.LoadCatalog(), filters, args.Contains("--extras"), args.Contains("--elevated"));
         try
         {
             return await runner.RunAllAsync();
@@ -84,7 +87,7 @@ internal sealed class E2ERunner
     {
         if (Directory.Exists(_outDir)) Directory.Delete(_outDir, recursive: true);
         Directory.CreateDirectory(_outDir);
-        Log.Info($"E2E: Start, Filter [{string.Join(", ", _filters)}], Extras {_extras}, Bericht {_outDir}");
+        Log.Info($"E2E: Start, Filter [{string.Join(", ", _filters)}], Extras {_extras}, Erhöht {_elevated}, als Admin {Desktop.IsElevated((uint)Environment.ProcessId)}, Bericht {_outDir}");
 
         _sandbox = CreateSandbox();
         _sandbox.Show();
@@ -138,13 +141,20 @@ internal sealed class E2ERunner
 
     async Task<(string, string, string)> RunExerciseAsync(Exercise ex)
     {
-        if (ex.NoAuto) return (ex.Id, "übersprungen", "noAuto (würde die VM sperren/vom Netz trennen)");
-        if (ex.Elevated) return (ex.Id, "übersprungen", "braucht Admin-Rechte (UAC-Abfrage ist nicht automatisierbar)");
+        if (ex.NoAuto) return (ex.Id, "übersprungen", "noAuto (Sperre, Netztrennung oder echte UAC-Abfrage – von Hand testen)");
+        if (ex.Elevated && !_elevated) return (ex.Id, "übersprungen", "öffnet ein erhöhtes Fenster (nur mit --elevated)");
         if (!TrainingSession.IsSupported(ex)) return (ex.Id, "übersprungen", "Übungsseite (Phase 5)");
         if (ex.Requires is { } req && _catalog.Software.TryGetValue(req, out var sw) && !sw.IsInstalled(p => File.Exists(p) || Directory.Exists(p)))
             return (ex.Id, "übersprungen", $"Software fehlt: {sw.Name}");
 
         await ActivateSandboxAsync();
+        if (ForegroundBlocker() is { } blocker)
+        {
+            // An elevated window (UIPI) swallows all synthetic input: every following test would fail misleadingly.
+            Log.Warn($"E2E: abgebrochen, Vordergrund blockiert: {blocker}");
+            _aborted = true;
+            return (ex.Id, "FEHLER", $"Abbruch: {blocker} lässt sich nicht verlassen (vermutlich mit Admin-Rechten). Bitte von Hand schließen und Test neu starten.");
+        }
         var before = Desktop.VisibleWindows();
         var started = DateTime.Now;
         _session = new TrainingSession([ex], _catalog.Contexts, _world);
@@ -162,6 +172,12 @@ internal sealed class E2ERunner
                 {
                     result = i == 0 ? "übersprungen" : $"teilweise ({i}/{steps.Count})";
                     detail = $"Schritt {i + 1} hat keinen automatischen Ablauf";
+                    break;
+                }
+                if (i > 0 && Desktop.InputBlocked())
+                {
+                    result = $"teilweise ({i}/{steps.Count})";
+                    detail = $"Schritt {i + 1} spielt in einem erhöhten Fenster – Test als Administrator starten";
                     break;
                 }
                 _stepTokens.Clear();
@@ -200,7 +216,7 @@ internal sealed class E2ERunner
             if (_aborted) return;
             if (action.StartsWith("wait:", StringComparison.Ordinal)) await Task.Delay(int.Parse(action[5..]));
             else if (action.StartsWith(InputToken.TextPrefix, StringComparison.Ordinal)) InputInjector.Text(action[InputToken.TextPrefix.Length..]);
-            else InputInjector.Combo(action);
+            else await InputInjector.ComboAsync(action);
             // Let the hook callbacks and the detector run.
             await Task.Delay(ActionGapMs);
         }
@@ -236,7 +252,7 @@ internal sealed class E2ERunner
             ? "Tasten " + string.Join(" | ", step.Expect!.AllSequences.Select(s => string.Join(", ", s)))
             : "verify " + JsonSerializer.Serialize(step.Verify, ReportJson);
         // Synthetic key presses only – nothing a person typed.
-        return $"Erwartet: {expected}<br>Vordergrund: {(fg is null ? "keins" : $"`{fg.Process}` Klasse `{fg.WindowClass}` Titel „{fg.Title}“ {fg.Placement}")}"
+        return $"Erwartet: {expected}<br>Vordergrund: {(fg is null ? "keins" : $"`{fg.Process}` Klasse `{fg.WindowClass}` Titel „{fg.Title}“ {fg.Placement}{(Desktop.InputBlocked() ? " (erhöht, Eingaben blockiert)" : "")}")}"
                + $"<br>Erkannte Eingaben: {(_stepTokens.Count == 0 ? "keine" : string.Join(", ", _stepTokens))}"
                + $"<br>Rückmeldung: {_session?.LastFeedback.Message}"
                + (saved ? $"<br>Screenshot: `{shot}`" : "");
@@ -246,7 +262,7 @@ internal sealed class E2ERunner
     {
         _report.AppendLine($"# KeyTrainer E2E-Bericht {DateTime.Now:yyyy-MM-dd HH:mm}");
         _report.AppendLine();
-        _report.AppendLine($"Version {Updates.Updater.CurrentVersion.ToString(3)}, Windows {Environment.OSVersion.Version}, " +
+        _report.AppendLine($"Version {Updates.Updater.CurrentVersion.ToString(3)}, Windows {Environment.OSVersion.Version}, als Admin: {(Desktop.IsElevated((uint)Environment.ProcessId) ? "ja" : "nein")}, " +
                            $"Layout 0x{GetKeyboardLayout(0).ToInt64():X8}{(_aborted ? ", **abgebrochen**" : "")}");
         _report.AppendLine();
         _report.AppendLine($"**{ok} OK · {failed} Fehler · {rows.Count - ok - failed} übersprungen/teilweise**");
@@ -256,6 +272,12 @@ internal sealed class E2ERunner
         foreach (var (id, result, detail) in rows.OrderBy(r => r.Result == "OK").ThenBy(r => r.Id))
             _report.AppendLine($"| {id} | {result} | {detail.Replace("|", "\\|")} |");
         File.WriteAllText(Path.Combine(_outDir, "report.md"), _report.ToString(), Encoding.UTF8);
+    }
+
+    string? ForegroundBlocker()
+    {
+        if (GetForegroundWindow() == new WindowInteropHelper(_sandbox!).Handle) return null;
+        return ForegroundWindow.Snapshot() is { } fg ? $"`{fg.Process}` „{fg.Title}“" : "eine UAC-Abfrage oder Sperre";
     }
 
     async Task ActivateSandboxAsync()

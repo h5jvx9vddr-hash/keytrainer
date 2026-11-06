@@ -35,6 +35,9 @@ internal static class Desktop
     public static async Task CleanupAsync(HashSet<IntPtr> before, DateTime since)
     {
         uint ownPid = (uint)Environment.ProcessId;
+        foreach (var hwnd in VisibleWindows().Except(before).Where(h => ClassName(h) == "Notepad"))
+            await DiscardNotepadAsync(hwnd);
+
         for (int round = 0; round < 3; round++)
         {
             var fresh = VisibleWindows().Except(before).Where(h =>
@@ -43,7 +46,13 @@ internal static class Desktop
                 return pid != ownPid && !Protected.Contains(ClassName(h));
             }).ToList();
             if (fresh.Count == 0) break;
-            foreach (var hwnd in fresh) PostMessage(hwnd, WM_CLOSE, IntPtr.Zero, IntPtr.Zero);
+            foreach (var hwnd in fresh)
+            {
+                if (PostMessage(hwnd, WM_CLOSE, IntPtr.Zero, IntPtr.Zero) || ClassName(hwnd).Length == 0) continue; // no class: already gone
+                // Elevated windows reject WM_CLOSE (UIPI). Left open in front, they would swallow all further test input.
+                bool ended = EndTask(hwnd, false, true);
+                Log.Info($"E2E: erhöhtes Fenster „{ClassName(hwnd)}“ per EndTask geschlossen: {ended}");
+            }
             await Task.Delay(1200);
         }
 
@@ -66,6 +75,53 @@ internal static class Desktop
                 process.Dispose();
             }
         }
+    }
+
+    /// <summary>
+    /// Closes a Notepad window and discards its text. Killed with unsaved text, Notepad restores the window on its
+    /// next start and later exercises begin with extra windows. Keys go out only while this very window is in front.
+    /// </summary>
+    static async Task DiscardNotepadAsync(IntPtr hwnd)
+    {
+        SetForegroundWindow(hwnd);
+        await Task.Delay(300);
+        if (GetForegroundWindow() != hwnd) return;
+        await InputInjector.ComboAsync("Alt+F4");
+        await Task.Delay(1500);
+        if (GetForegroundWindow() != hwnd) return;
+        await InputInjector.ComboAsync("Alt+N"); // "Nicht speichern" in the save question
+        await Task.Delay(800);
+    }
+
+    /// <summary>True if the process runs elevated; false if that cannot be determined.</summary>
+    public static bool IsElevated(uint processId)
+    {
+        var process = OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, false, processId);
+        if (process == IntPtr.Zero) return false;
+        try
+        {
+            if (!OpenProcessToken(process, TOKEN_QUERY, out var token)) return false;
+            try
+            {
+                return GetTokenInformation(token, TokenElevation, out int elevated, sizeof(int), out _) && elevated != 0;
+            }
+            finally
+            {
+                CloseHandle(token);
+            }
+        }
+        finally
+        {
+            CloseHandle(process);
+        }
+    }
+
+    /// <summary>Elevated foreground window while this process is not: Windows then drops all synthetic input (UIPI).</summary>
+    public static bool InputBlocked()
+    {
+        if (IsElevated((uint)Environment.ProcessId)) return false;
+        GetWindowThreadProcessId(GetForegroundWindow(), out uint pid);
+        return IsElevated(pid);
     }
 
     public static string ClassName(IntPtr hwnd)

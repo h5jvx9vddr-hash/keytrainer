@@ -44,12 +44,17 @@ Start-Process publish\KeyTrainer.exe --selftest -Wait    # Hook, Hotkeys, Win+R 
 Start-Process publish\KeyTrainer.exe '--e2e' -Wait       # alle Kern-Aufgaben automatisch durchspielen
 Start-Process publish\KeyTrainer.exe '--e2e explorer-ordner browser-' -Wait   # nur bestimmte (ID-Präfixe)
 Start-Process publish\KeyTrainer.exe '--e2e --extras' -Wait                   # inkl. Kommandozeile, Terminal …
+Start-Process publish\KeyTrainer.exe '--e2e --elevated' -Wait                 # inkl. Aufgaben, deren Ziel erhöht startet
+Start-Process publish\KeyTrainer.exe '--e2e --elevated' -Verb RunAs -Wait     # als Administrator: auch Tasten in MMC und Task-Manager
 ```
 
 - **Bericht:** `%APPDATA%\KeyTrainer\e2e\report.md`, pro Fehler ein Screenshot daneben (mit dem Read-Tool ansehen). Der Bericht nennt erwartete Prüfung, tatsächliches Vordergrundfenster (Prozess, Klasse, Titel, Platzierung) und die erkannten Eingaben.
 - **Log:** `%APPDATA%\KeyTrainer\logs\keytrainer-JJJJ-MM-TT.log`.
 - **Während `--e2e` läuft, nichts tippen** – der Test drückt echte Tasten. Er holt vor jeder Aufgabe sein eigenes Testfenster nach vorn und schließt danach alle neu geöffneten Fenster. Abbruch: `Strg + Alt + Shift + Q`. Immer mit `Start-Process … -Wait` starten, nie im Vordergrund des eigenen Terminals.
-- Nicht automatisierbar und deshalb übersprungen: UAC-Abfragen (`elevated`), PC sperren, `ipconfig /release` (`noAuto`). Diese prüft der Nutzer von Hand.
+- Nicht automatisierbar und deshalb übersprungen (`noAuto`): echte UAC-Abfragen (`regedit`), PC sperren, `ipconfig /release`. Diese prüft der Nutzer von Hand.
+- **Erhöhte Fenster:** Bei einem Admin-Konto mit Standard-UAC laufen MMC-Konsolen, Task-Manager, Systemeigenschaften und Adapter-Eigenschaften ohne Abfrage erhöht. Windows verwirft dann alle simulierten Eingaben (UIPI), auch Maus, `WM_CLOSE` und Fensterwechsel; der Hook sieht dort nichts. Der Test meldet solche Schritte als „teilweise“ und schließt die Fenster per `EndTask`. Nur der Lauf als Administrator spielt diese Schritte. `__COMPAT_LAYER=RunAsInvoker` senkt MMC ab (zum Ausprobieren), den Task-Manager nicht.
+- **Der Test verwirft ungespeicherten Text** neu geöffneter Editor-Fenster – deshalb nur in der VM laufen lassen.
+- **Tasten:** Kombinationen gehen mit Abständen raus, Zugriffstasten in XAML-Dialogen (`Alt+N` = „Nicht speichern“) ignorieren sonst den ganzen Block.
 
 ## Typische Korrekturen
 
@@ -64,13 +69,15 @@ Start-Process publish\KeyTrainer.exe '--e2e --extras' -Wait                   # 
 2. Commit mit aussagekräftiger Nachricht (deutsch), `git push`. Jeder grüne Push auf `main` wird per CI zu einem Release `v0.2.<n>`, das der Update-Knopf installiert.
 3. Dem Nutzer melden: was behoben wurde, was offen bleibt, welche Punkte er selbst testen muss (UAC, Sperren, echte Maus).
 
-## Offene Punkte (Stand 04.11.2026)
+## Offene Punkte (Stand 06.11.2026)
 
-Letzter CI-Lauf auf englischem Windows Server 2025: 52 OK, 4 Fehler – davon 2 nur dort (kein Rechner auf Server, „ö“ auf US-Layout), `tool-druckwarteschlange` tippt „Druck“ (passt nur auf deutschem Windows), `tool-adapter` wurde danach korrigiert (Leertaste markiert). Auf dem deutschen Windows 11 der VM muss alles neu bewertet werden.
+Letzter Lauf auf deutschem Windows 11 25H2 (`--e2e --elevated`, ohne Admin-Rechte): 61 OK, 0 Fehler, 5 begründet übersprungen/teilweise.
 
-- Alle Aufgaben mit `"unverified": true` im Katalog auf echtem deutschen Windows 11 bestätigen oder korrigieren.
-- `start-taskmanager-beenden` Schritt 3: Bedienweg im Task-Manager (Suche/Liste) klären und `auto` ergänzen.
-- Fenster nebeneinander (`fenster-links-rechts`): Snap-Assist-Verhalten prüfen.
+- `start-taskmanager-beenden` Schritt 3: Der Task-Manager erhöht sich immer selbst; Bedienweg im Lauf als Administrator klären (Listeneintrag heißt „Notepad.exe“, nicht „Editor“).
+- `tool-druckwarteschlange` Schritt 2: in einer nicht erhöhten Konsole bestätigt (zweimal Tab, „Druckw“), im Lauf als Administrator nachprüfen.
+- Maus-Klicks in erhöhten Fenstern erkennt der Trainer nicht, und Tasten-Schritte (`mode: keys`) in erhöhten Fenstern können nicht gelingen. Ergebnis-Schritte funktionieren.
+- Übrige Aufgaben mit `"unverified": true` betreffen Extras (RDP, VM, Outlook, Teams, AD).
+- Der Test lässt die Einstellungen-App offen; harmlos.
 - Danach laut PLAN.md: Wiederholung (Leitner) + Statistik über Tage, Übungsseite für Vimium/Formulare (Phase 5), Code-Signatur (Phase 6).
 
 ## Start-Prompt (in Claude Code in der VM einfügen)

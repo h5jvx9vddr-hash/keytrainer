@@ -9,14 +9,14 @@ namespace KeyTrainer.Tests;
 sealed class FakeWorld : IWorld
 {
     public WindowSnapshot? Window { get; set; }
-    public HashSet<string> Processes { get; } = new(StringComparer.OrdinalIgnoreCase);
-    public Dictionary<string, DateTime> StartTimes { get; } = new(StringComparer.OrdinalIgnoreCase);
+    public Dictionary<string, int> Windows { get; } = new(StringComparer.OrdinalIgnoreCase);
+    public Dictionary<string, HashSet<int>> Pids { get; } = new(StringComparer.OrdinalIgnoreCase);
     public HashSet<string> Paths { get; } = [];
     public DateTime? LastSessionLock { get; set; }
 
     public WindowSnapshot? Foreground() => Window;
-    public bool IsProcessRunning(string name) => Processes.Contains(name);
-    public DateTime? ProcessStartTime(string name) => StartTimes.TryGetValue(name, out var t) ? t : null;
+    public int WindowCount(string process) => Windows.GetValueOrDefault(process);
+    public IReadOnlySet<int> ProcessIds(string name) => Pids.TryGetValue(name, out var ids) ? ids : [];
     public bool PathExists(string path) => Paths.Contains(path);
 }
 
@@ -224,7 +224,7 @@ public class TrainingSessionTests
     }
 
     [Fact]
-    public void Verify_WindowState_ProcessGone_Restart_Lock()
+    public void Verify_WindowState_WindowClosed_Restart_Lock()
     {
         var max = Session(Goal("max", new Verify { WindowClass = "CabinetWClass", WindowState = "maximized" }));
         _world.Window = Explorer;
@@ -234,19 +234,28 @@ public class TrainingSessionTests
         max.Poll();
         Assert.True(max.IsSolved);
 
-        _world.Processes.Add("Notepad.exe");
-        var gone = Session(Goal("gone", new Verify { ProcessGone = "Notepad.exe" }));
-        gone.Poll();
-        Assert.False(gone.IsSolved);
-        _world.Processes.Clear();
-        gone.Poll();
-        Assert.True(gone.IsSolved);
+        // Another window of the same program stays open: closing one is enough.
+        _world.Windows["Notepad.exe"] = 1;
+        var closed = Session(Goal("closed", new Verify { WindowClosed = "Notepad.exe" }));
+        closed.Poll();
+        Assert.False(closed.IsSolved);
+        // A restored window appears late: it raises the count to beat.
+        _world.Windows["Notepad.exe"] = 2;
+        closed.Poll();
+        Assert.False(closed.IsSolved);
+        _world.Windows["Notepad.exe"] = 1;
+        closed.Poll();
+        Assert.True(closed.IsSolved);
 
-        _world.StartTimes["spoolsv.exe"] = _now.AddHours(-1);
+        _world.Pids["spoolsv.exe"] = [100];
         var restart = Session(Goal("restart", new Verify { ProcessRestarted = "spoolsv.exe" }));
         restart.Poll();
         Assert.False(restart.IsSolved);
-        _world.StartTimes["spoolsv.exe"] = _now.AddSeconds(1);
+        // Stopped: not restarted yet.
+        _world.Pids["spoolsv.exe"] = [];
+        restart.Poll();
+        Assert.False(restart.IsSolved);
+        _world.Pids["spoolsv.exe"] = [200];
         restart.Poll();
         Assert.True(restart.IsSolved);
 

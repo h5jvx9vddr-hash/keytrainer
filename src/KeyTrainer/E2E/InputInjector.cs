@@ -7,14 +7,19 @@ namespace KeyTrainer.E2E;
 /// <summary>Presses keys and types text via SendInput, like a person would. Only used by the end-to-end test.</summary>
 internal static class InputInjector
 {
+    const int ComboGapMs = 30;
+
     static readonly HashSet<int> ExtendedKeys =
     [
         Vk.Left, Vk.Up, Vk.Right, Vk.Down, Vk.Home, Vk.End, Vk.Prior, Vk.Next, Vk.Insert, Vk.Delete,
         Vk.RMenu, Vk.RControl, Vk.LWin, Vk.RWin, Vk.Apps, Vk.Divide, Vk.NumLock,
     ];
 
-    /// <summary>Presses a combo in any spelling ("Strg+Shift+T", "Win").</summary>
-    public static void Combo(string text)
+    /// <summary>
+    /// Presses a combo in any spelling ("Strg+Shift+T", "Win") with gaps like a person: XAML access keys (Alt, N)
+    /// ignore keys sent in one block. Awaited so the keyboard hook on this thread keeps running in between.
+    /// </summary>
+    public static async Task ComboAsync(string text)
     {
         var combo = Core.Input.Combo.Parse(text);
         var keys = new List<int>();
@@ -24,7 +29,16 @@ internal static class InputInjector
         if (combo.Mods.HasFlag(Mods.Shift)) keys.Add(Vk.LShift);
         if (combo.Key.Length > 0)
             keys.Add(KeyNames.VkOf(combo.Key) ?? throw new FormatException($"Taste \"{combo.Key}\" kann nicht gesendet werden."));
-        Send(keys);
+        foreach (var key in keys) await SendOneAsync(key, up: false);
+        foreach (var key in Enumerable.Reverse(keys)) await SendOneAsync(key, up: true);
+    }
+
+    static async Task SendOneAsync(int key, bool up)
+    {
+        var input = new[] { Key(key, up) };
+        if (SendInput(1, input, Marshal.SizeOf<INPUT>()) != 1)
+            throw new InvalidOperationException($"SendInput fehlgeschlagen (Win32-Fehler {Marshal.GetLastWin32Error()}).");
+        await Task.Delay(ComboGapMs);
     }
 
     /// <summary>Types text with real key strokes of the foreground keyboard layout (so the hook sees normal keys).</summary>

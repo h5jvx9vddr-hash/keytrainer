@@ -196,6 +196,8 @@ internal static class NativeMethods
 
     // ---- End-to-end test helpers: list/close windows, capture the screen
     public const uint WM_CLOSE = 0x0010;
+    public const uint TOKEN_QUERY = 0x0008;
+    public const int TokenElevation = 20;
     public const int SM_XVIRTUALSCREEN = 76;
     public const int SM_YVIRTUALSCREEN = 77;
     public const int SM_CXVIRTUALSCREEN = 78;
@@ -213,9 +215,22 @@ internal static class NativeMethods
     [return: MarshalAs(UnmanagedType.Bool)]
     public static extern bool IsWindowVisible(IntPtr hwnd);
 
-    [DllImport("user32.dll")]
+    [DllImport("user32.dll", SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
     public static extern bool PostMessage(IntPtr hwnd, uint msg, IntPtr wParam, IntPtr lParam);
+
+    /// <summary>What Task Manager uses to close a window; unlike WM_CLOSE it also reaches elevated windows.</summary>
+    [DllImport("user32.dll", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static extern bool EndTask(IntPtr hwnd, [MarshalAs(UnmanagedType.Bool)] bool shutdown, [MarshalAs(UnmanagedType.Bool)] bool force);
+
+    [DllImport("advapi32.dll", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static extern bool OpenProcessToken(IntPtr process, uint access, out IntPtr token);
+
+    [DllImport("advapi32.dll", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static extern bool GetTokenInformation(IntPtr token, int infoClass, out int info, int length, out int returned);
 
     [DllImport("user32.dll")]
     public static extern IntPtr GetDC(IntPtr hwnd);

@@ -125,10 +125,13 @@ public sealed class Verify : WindowMatch
 
     public bool SessionLock { get; init; }
 
-    /// <summary>No process with this name may be running.</summary>
-    public string? ProcessGone { get; init; }
+    /// <summary>
+    /// This process must show fewer windows than when the step began, or none at all. Other windows of the same
+    /// program may stay open, so this works from any starting state.
+    /// </summary>
+    public string? WindowClosed { get; init; }
 
-    /// <summary>Process whose start time must change, e.g. "spoolsv.exe" after restarting the spooler.</summary>
+    /// <summary>Process that must run under a new process id, e.g. "spoolsv.exe" after restarting the spooler.</summary>
     public string? ProcessRestarted { get; init; }
 
     /// <summary>File or folder that must exist (environment variables are expanded).</summary>

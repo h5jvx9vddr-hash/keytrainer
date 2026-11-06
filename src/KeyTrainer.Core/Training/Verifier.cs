@@ -8,9 +8,11 @@ public interface IWorld
 {
     WindowSnapshot? Foreground();
 
-    bool IsProcessRunning(string name);
+    /// <summary>Visible top-level windows of all processes with this name.</summary>
+    int WindowCount(string process);
 
-    DateTime? ProcessStartTime(string name);
+    /// <summary>Ids of all running processes with this name. Needs no rights, unlike start times of system services.</summary>
+    IReadOnlySet<int> ProcessIds(string name);
 
     /// <summary>Path with environment variables already expanded.</summary>
     bool PathExists(string path);
@@ -23,7 +25,10 @@ public sealed class StepBaseline
 {
     public DateTime Started { get; init; }
 
-    public DateTime? ProcessStart { get; init; }
+    public IReadOnlySet<int> ProcessIds { get; init; } = new HashSet<int>();
+
+    /// <summary>Most windows seen during the step; programs like Notepad restore further windows after the first.</summary>
+    public int WindowCount { get; set; }
 
     /// <summary>Title of the first matching foreground window seen during the step.</summary>
     public string? Title { get; set; }
@@ -36,7 +41,8 @@ public static class Verifier
         var baseline = new StepBaseline
         {
             Started = now,
-            ProcessStart = verify?.ProcessRestarted is { } name ? world.ProcessStartTime(name) : null,
+            ProcessIds = verify?.ProcessRestarted is { } name ? world.ProcessIds(name) : new HashSet<int>(),
+            WindowCount = verify?.WindowClosed is { } process ? world.WindowCount(process) : 0,
         };
         // Remember the title right away: a fast key press may change it before the next poll.
         if (verify is { TitleChanged: true } && world.Foreground() is { } window && WindowMatcher.Matches(verify, window))
@@ -48,11 +54,20 @@ public static class Verifier
     public static bool IsMet(Verify verify, IWorld world, StepBaseline baseline)
     {
         if (verify.SessionLock && !(world.LastSessionLock is { } locked && locked >= baseline.Started)) return false;
-        if (verify.ProcessGone is { } gone && world.IsProcessRunning(gone)) return false;
+        if (verify.WindowClosed is { } closed)
+        {
+            int count = world.WindowCount(closed);
+            if (count > 0 && count >= baseline.WindowCount)
+            {
+                baseline.WindowCount = count;
+                return false;
+            }
+        }
         if (verify.ProcessRestarted is { } restarted)
         {
-            var start = world.ProcessStartTime(restarted);
-            if (start is null || (baseline.ProcessStart is { } before && start <= before)) return false;
+            // A restarted service runs under a new process id.
+            var ids = world.ProcessIds(restarted);
+            if (ids.Count == 0 || ids.All(baseline.ProcessIds.Contains)) return false;
         }
         if (verify.PathExists is { } exists && !world.PathExists(Environment.ExpandEnvironmentVariables(exists))) return false;
         if (verify.PathMissing is { } missing && world.PathExists(Environment.ExpandEnvironmentVariables(missing))) return false;

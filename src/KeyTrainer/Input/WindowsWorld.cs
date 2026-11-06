@@ -15,20 +15,19 @@ internal sealed class WindowsWorld : IWorld
 
     public WindowSnapshot? Foreground() => ForegroundWindow.Snapshot();
 
-    public bool IsProcessRunning(string name) => Processes(name).Length > 0;
-
-    public DateTime? ProcessStartTime(string name)
+    public int WindowCount(string process)
     {
-        try
+        var pids = Processes(process).Select(p => (uint)p.Id).ToHashSet();
+        int count = 0;
+        EnumWindows((hwnd, _) =>
         {
-            return Processes(name).Select(p => (DateTime?)p.StartTime).Max();
-        }
-        catch (Exception ex) when (ex is System.ComponentModel.Win32Exception or InvalidOperationException)
-        {
-            Log.Warn($"Startzeit von {name} nicht lesbar", ex);
-            return null;
-        }
+            if (IsWindowVisible(hwnd) && GetWindowThreadProcessId(hwnd, out uint pid) != 0 && pids.Contains(pid)) count++;
+            return true;
+        }, IntPtr.Zero);
+        return count;
     }
+
+    public IReadOnlySet<int> ProcessIds(string name) => Processes(name).Select(p => p.Id).ToHashSet();
 
     public bool PathExists(string path) => File.Exists(path) || Directory.Exists(path);
 

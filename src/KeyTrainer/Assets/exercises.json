@@ -2,7 +2,7 @@
   "_doc": [
     "Übungskatalog des KeyTrainers (Version 2: Ziele statt fester Kürzel). Neue Übungen nur hier eintragen.",
     "mode: result (Ziel wird am PC-Zustand geprüft, jeder Tastatur-Weg zählt) | keys (Kürzel-Folge, andere Tasten werden ignoriert) | scenario (steps).",
-    "verify: process, windowClass ('a|b'), titleRegex, windowState (maximized/leftHalf/rightHalf), titleChanged, sessionLock, processGone, processRestarted, pathExists, pathMissing.",
+    "verify: process, windowClass ('a|b'), titleRegex, windowState (maximized/leftHalf/rightHalf), titleChanged, sessionLock, windowClosed, processRestarted, pathExists, pathMissing.",
     "expect.sequence: 'Strg+Shift+T' oder 'text:…' (Groß/Klein egal, '*' = beliebig). solution: immer konkretes Beispiel, nie '*'.",
     "hints: Tipps in steigender Deutlichkeit; danach zeigt der Trainer 'Schnellster Weg: <solution>'.",
     "extraCategories: nicht im Standard-Training. software: was manche Übungen brauchen und wie man es installiert.",
@@ -348,22 +348,24 @@
             "text:notepad",
             "wait:1500",
             "Enter",
-            "wait:2500"
+            "wait:5000"
           ]
         },
         {
           "prompt": "Schließe den Editor wieder",
           "hints": [
             "Alt und eine Funktionstaste schließen das aktive Fenster",
-            "Fragt er nach Speichern: mit Tab/Pfeiltasten „Nicht speichern“ wählen"
+            "Fragt er nach Speichern: Alt + N heißt „Nicht speichern“"
           ],
           "solution": "Alt + F4",
           "mode": "result",
           "verify": {
-            "processGone": "Notepad.exe"
+            "windowClosed": "Notepad.exe"
           },
           "auto": [
             "Alt+F4",
+            "wait:1500",
+            "Alt+N",
             "wait:1500"
           ]
         }
@@ -457,7 +459,7 @@
           "solution": "Tab bis zur Liste, „Editor“ tippen, Entf",
           "mode": "result",
           "verify": {
-            "processGone": "Notepad.exe"
+            "windowClosed": "Notepad.exe"
           }
         }
       ],
@@ -644,8 +646,7 @@
             "wait:500"
           ]
         }
-      ],
-      "unverified": true
+      ]
     },
     {
       "id": "fenster-desktop",
@@ -2196,6 +2197,7 @@
         "process": "regedit.exe"
       },
       "elevated": true,
+      "noAuto": true,
       "auto": [
         "Win+R",
         "wait:800",
@@ -2218,7 +2220,6 @@
       "verify": {
         "titleRegex": "Energieoptionen|Energie|Power Options"
       },
-      "unverified": true,
       "auto": [
         "Win+R",
         "wait:800",
@@ -2307,7 +2308,7 @@
       "hints": [
         "Dienste-Verwaltung, dann tippen, dann Eigenschaften"
       ],
-      "solution": "services.msc, Tab, „Druck“ tippen, Alt + Enter",
+      "solution": "services.msc, zweimal Tab, „Druckw“ tippen, Alt + Enter",
       "steps": [
         {
           "prompt": "Öffne die Dienste-Verwaltung",
@@ -2331,10 +2332,11 @@
         {
           "prompt": "Springe zur Druckwarteschlange und öffne ihre Eigenschaften",
           "hints": [
-            "Mit Tab in die Liste – Tippen springt zum Eintrag",
+            "Zweimal Tab führt in die Liste – Tippen springt zum Eintrag",
+            "„Druck“ allein trifft die Druckererweiterungen, also weitertippen: „Druckw“",
             "Alt + Enter öffnet die Eigenschaften"
           ],
-          "solution": "Tab, „Druck“ tippen, Alt + Enter",
+          "solution": "Zweimal Tab, „Druckw“ tippen, Alt + Enter",
           "mode": "result",
           "verify": {
             "titleRegex": "Druckwarteschlange|Print Spooler"
@@ -2342,7 +2344,9 @@
           "auto": [
             "Tab",
             "wait:400",
-            "text:Druck",
+            "Tab",
+            "wait:400",
+            "text:Druckw",
             "wait:800",
             "Alt+Enter",
             "wait:2000"

@@ -51,7 +51,7 @@ internal static class SelfTest
                 for (int s = 0; s < session.StepCount && session.Step is not null; s++) session.Poll();
             }
             Log.Info($"Selbsttest: alle {session.PoolSize} Aufgaben einmal gestellt und geprüft");
-            Log.Info($"Selbsttest: Startzeit spoolsv.exe lesbar: {world.ProcessStartTime("spoolsv.exe") is not null}");
+            Log.Info($"Selbsttest: spoolsv.exe-Prozesse sichtbar: {world.ProcessIds("spoolsv.exe").Count}");
 
             // Many calls, so buffer overruns in the ToUnicodeEx interop corrupt the heap and crash here, not on the user's PC.
             for (int i = 0; i < 2000; i++)
